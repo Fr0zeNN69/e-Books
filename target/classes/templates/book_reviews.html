@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.title}">Book Details</title>
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="navbar" th:replace="navbar.html :: navbar"></div>
+
+<div class="container">
+    <h1 th:text="${book.title}">Book Title</h1>
+    <p th:if="${book.authors != null}">
+        By: <span th:each="author : ${book.authors}" th:text="${author}">Author</span>
+    </p>
+
+    <!-- Formular pentru adăugarea unui review -->
+    <h3>Add Your Review</h3>
+    <form th:action="@{/reviews/add}" method="post">
+        <input type="hidden" name="bookId" th:value="${book.id}"/>
+        <textarea name="reviewText" placeholder="Write your review here..." required></textarea>
+        <br>
+        <label for="rating">Rating:</label>
+        <select name="rating" id="rating" required>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+        <br><br>
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <h3>Reviews</h3>
+    <div th:if="${reviews != null}">
+        <div th:each="review : ${reviews}">
+            <p><strong th:text="${review.username}">Username</strong> rated it
+                <strong th:text="${review.rating}">Rating</strong> stars
+            </p>
+            <p th:text="${review.reviewText}">Review text</p>
+            <p><em th:text="${review.reviewDate}">Review date</em></p>
+            <hr>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

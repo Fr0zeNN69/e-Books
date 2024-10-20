@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${book.title}">Book Details</title>
+</head>
+<body>
+<h1 th:text="${book.title}">Book Title</h1>
+<p th:if="${book.authors != null}">
+  By: <span th:each="author : ${book.authors}" th:text="${author}">Author</span>
+</p>
+<p th:unless="${book.authors != null}">Author information not available</p>
+
+<h3>Book Reviews</h3>
+<!-- Afișarea recenziilor asociate cărții -->
+<div th:each="review : ${book.reviews}">
+  <p><strong th:text="${review.username}">Username</strong> rated it <strong th:text="${review.rating}">Rating</strong> stars</p>
+  <p th:text="${review.reviewText}">Review text</p>
+  <p><em th:text="${review.reviewDate}">Review date</em></p>
+  <hr>
+</div>
+</body>
+</html>
