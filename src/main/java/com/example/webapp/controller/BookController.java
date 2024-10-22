@@ -4,11 +4,11 @@ import com.example.webapp.model.Book;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication; // Adăugat importul corect
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-// Asigură-te că ai importat BookRepository
 import com.example.webapp.repository.BookRepository;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,9 +22,8 @@ public class BookController {
     private BookRepository bookRepository;
 
     @GetMapping("/search")
-    public String searchBooks(@RequestParam("query") String query, Model model) {
+    public String searchBooks(@RequestParam("query") String query, Model model, Authentication authentication) {
         RestTemplate restTemplate = new RestTemplate();
-        // Dacă ai adăugat cheia API în application.properties, poți să o utilizezi aici
         String url = "https://www.googleapis.com/books/v1/volumes?q=" + query;
 
         // Apel API și obține JSON ca String
@@ -38,19 +37,12 @@ public class BookController {
             JsonNode root = mapper.readTree(response);
             JsonNode items = root.path("items");
 
-            // Iterează prin rezultate și extrage titlul și autorii
             if (items.isArray()) {
                 for (JsonNode item : items) {
                     Book book = new Book();
-
-                    // Setează ID-ul cărții folosind ID-ul de la Google Books
                     book.setId(item.path("id").asText());
-
-
-                    // Setează titlul cărții
                     book.setTitle(item.path("volumeInfo").path("title").asText());
 
-                    // Extrage autorii și setează-i ca un șir de caractere
                     JsonNode authorsNode = item.path("volumeInfo").path("authors");
                     if (authorsNode.isArray()) {
                         List<String> authorsList = new ArrayList<>();
@@ -62,11 +54,9 @@ public class BookController {
                         book.setAuthors("Unknown");
                     }
 
-                    // Verifică dacă cartea există deja în baza de date și salveaz-o dacă nu există
                     if (!bookRepository.existsById(book.getId())) {
                         bookRepository.save(book);
                     }
-
 
                     books.add(book);
                 }
@@ -75,9 +65,16 @@ public class BookController {
             e.printStackTrace();
         }
 
-        // Adaugă cărțile parseate în model pentru afișare
+        // Adaugă cărțile în model
         model.addAttribute("books", books);
 
-        return "book_search_results"; // redirecționează la pagina book_search_results.html
+        // Obține numele utilizatorului autentificat și adaugă-l în model
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            model.addAttribute("username", authentication.getName());
+        } else {
+            model.addAttribute("username", "User");
+        }
+
+        return "book_search_results";
     }
 }

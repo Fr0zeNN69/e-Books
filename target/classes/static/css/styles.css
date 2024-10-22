@@ -23,6 +23,9 @@ body {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    position: relative;
+    z-index: 1001; /* Asigură că navbar-ul e deasupra meniului lateral */
 }
 
 .navbar h1 {
@@ -38,6 +41,14 @@ body {
     gap: 25px;
 }
 
+/* Stilizare pentru butonul de meniu */
+#menu-button {
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    z-index: 1002; /* Asigură-te că butonul rămâne vizibil chiar și când meniul e deschis */
+}
+
 /* Stilizare pentru bara de căutare */
 .search-bar {
     position: relative;
@@ -47,13 +58,13 @@ body {
     background-color: transparent;
     border: none;
     color: white;
-    font-size: 24px; /* Mărim iconița de căutare */
+    font-size: 24px;
     cursor: pointer;
     transition: color 0.3s ease;
 }
 
 .search-bar button:hover {
-    color: #1abc9c; /* Schimbă culoarea la hover */
+    color: #1abc9c;
 }
 
 .search-dropdown {
@@ -65,6 +76,7 @@ body {
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 }
 
 .search-dropdown.active {
@@ -101,7 +113,7 @@ body {
 }
 
 .user-menu button:hover {
-    background-color: #1abc9c; /* Culoare la hover */
+    background-color: #1abc9c;
 }
 
 .user-menu .dropdown-menu {
@@ -186,12 +198,6 @@ body {
     margin-top: 10px;
 }
 
-.book-item .rating {
-    font-weight: bold;
-    color: #27ae60;
-    margin-top: 10px;
-}
-
 /* Stilizare pentru footer */
 footer {
     background-color: #2c3e50;
@@ -206,4 +212,40 @@ footer {
 footer p {
     margin: 0;
     font-size: 14px;
+}
+
+/* Stil pentru meniu lateral */
+#side-menu {
+    position: fixed;
+    left: -250px; /* Ascunde meniul inițial în afara ecranului */
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #2c3e50;
+    color: white;
+    transition: left 0.3s ease; /* Animație pentru deschiderea meniului */
+    padding-top: 60px; /* Pentru a evita suprapunerea cu navbar-ul */
+    z-index: 1000; /* Asigură-te că meniul e deasupra conținutului */
+}
+
+#side-menu.open {
+    left: 0; /* Meniul apare din stânga */
+}
+
+#side-menu a {
+    display: block;
+    color: white;
+    padding: 15px 20px;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+#side-menu a:hover {
+    background-color: #1abc9c;
+}
+
+/* Containerul care se mută când meniul este deschis */
+.container.menu-open {
+    transform: translateX(250px); /* Mută conținutul în dreapta când meniul e deschis */
+    transition: transform 0.3s ease;
 }
