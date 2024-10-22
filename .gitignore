@@ -1,10 +1,1 @@
 src/main/resources/application.properties
-# Ignoră fișierele și directoarele generate de build
-/target/
-
-# Ignoră fișierele și directoarele IDE-ului
-/.idea/
-*.iml
-
-# Ignoră fișierele compilate Java
-*.class

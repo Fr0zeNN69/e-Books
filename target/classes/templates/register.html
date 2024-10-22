@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .register-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #28a745;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .register-btn:hover {
+            background-color: #218838;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            display: block;
+            font-size: 14px;
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-link:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="register-container">
+    <h2>Inregistrare utilizator nou</h2>
+
+    <form th:action="@{/users/register}" method="post">
+        <div class="form-group">
+            <label for="name">Nume:</label>
+            <input type="text" id="name" name="name" placeholder="Introduceți numele" required/>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Introduceți emailul" required/>
+        </div>
+        <div class="form-group">
+            <label for="username">Nume utilizator:</label>
+            <input type="text" id="username" name="username" placeholder="Introduceți numele de utilizator" required/>
+        </div>
+        <div class="form-group">
+            <label for="password">Parola:</label>
+            <input type="password" id="password" name="password" placeholder="Introduceți parola" required/>
+        </div>
+        <div>
+            <button type="submit" class="register-btn">Inregistreaza-te</button>
+        </div>
+    </form>
+
+    <!-- Link pentru redirecționare la login -->
+    <a href="/login" class="login-link">Already have an account? Login here</a>
+</div>
+
+</body>
+</html>

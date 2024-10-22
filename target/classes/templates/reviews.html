@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Recenzii pentru <span th:text="${bookTitle}"></span></title>
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Include navbar -->
+<div th:replace="navbar.html :: navbar"></div>
+
+<h1>Recenzii pentru <span th:text="${bookTitle}"></span></h1>
+
+<div th:each="review : ${reviews}">
+  <h3 th:text="${review.username}"></h3>
+  <p th:text="${review.reviewText}"></p>
+  <p>Rating: <span th:text="${review.rating}"></span> / 5</p>
+  <p>Data recenziei: <span th:text="${review.reviewDate}"></span></p>
+  <hr>
+</div>
+
+<h2>Adaugă o recenzie:</h2>
+<form action="/reviews/add" method="post">
+  <input type="hidden" name="bookTitle" th:value="${bookTitle}">
+  <textarea name="reviewText" placeholder="Scrie recenzia ta..." required></textarea>
+  <br>
+  <label for="rating">Evaluare:</label>
+  <select name="rating" id="rating">
+    <option value="1">1 stea</option>
+    <option value="2">2 stele</option>
+    <option value="3">3 stele</option>
+    <option value="4">4 stele</option>
+    <option value="5">5 stele</option>
+  </select>
+  <br>
+  <button type="submit">Adaugă Recenzie</button>
+</form>
+
+<a href="/home">Înapoi la home</a>
+
+</body>
+</html>
