@@ -1,6 +1,8 @@
 package com.example.webapp.controller;
 
 import com.example.webapp.model.Book;
+import com.example.webapp.model.User;
+import com.example.webapp.repository.BookRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +11,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.example.webapp.repository.BookRepository;
 import org.springframework.web.client.RestTemplate;
+import com.example.webapp.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class BookController {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/search")
     public String searchBooks(@RequestParam("query") String query, Model model, Authentication authentication) {
@@ -60,9 +67,7 @@ public class BookController {
                     if (description == null || description.isEmpty()) {
                         description = "Description not available.";
                     }
-                    //System.out.println("Descrierea cărții: " + description); // Adaugă acest log pentru a verifica
                     book.setDescription(description);
-
 
                     // Verifică dacă cartea există deja în baza de date și salveaz-o dacă nu există
                     if (!bookRepository.existsById(book.getId())) {
@@ -78,6 +83,19 @@ public class BookController {
 
         // Adaugă cărțile în model
         model.addAttribute("books", books);
+
+        // Obține lista de bookIds din favorite
+        Set<String> favoriteBookIds = new HashSet<>();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username).orElse(null);
+            if (user != null) {
+                for (Book favBook : user.getFavoriteBooks()) {
+                    favoriteBookIds.add(favBook.getId());
+                }
+            }
+        }
+        model.addAttribute("favoriteBookIds", favoriteBookIds);
 
         // Obține numele utilizatorului autentificat și adaugă-l în model
         if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
