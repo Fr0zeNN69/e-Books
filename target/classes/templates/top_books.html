@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Books</title>
+  <link href="/css/styles.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Include navbar -->
+<div th:replace="navbar.html"></div>
+
+<!-- Container principal pentru top books -->
+<div class="container">
+  <p class="fav-books-message">Top Books</p>
+
+  <!-- Verifică dacă există cărți în lista books -->
+  <div th:if="${#lists.isEmpty(books)}" class="no-results">
+    <p>No books found.</p>
+  </div>
+
+  <!-- Afișează lista de cărți -->
+  <div th:unless="${#lists.isEmpty(books)}">
+    <ul class="book-list">
+      <li class="book-item" th:each="book : ${books}">
+        <!-- Butonul în formă de inimă -->
+        <button class="favorite-button"
+                th:data-book-id="${book.id}"
+                th:classappend="${favoriteBookIds.contains(book.id)} ? ' favorited' : ''">
+          <i class="fas fa-heart"></i>
+        </button>
+        <h3 th:text="${book.title}">Titlu carte</h3>
+        <p><strong>Autor:</strong> <span th:text="${book.authors}">Autor</span></p>
+        <p><strong>Gen:</strong> <span th:text="${book.categories}">Categorie</span></p>
+        <p><strong>Descriere:</strong> <span th:text="${book.description}">Descriere</span></p>
+
+        <!-- Rating mediu -->
+        <div class="rating">
+            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                <i th:class="${i <= book.averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
+            </span>
+          <span th:text="'(' + ${T(java.lang.String).format('%.1f', book.averageRating)} + ' / 5)'"></span>
+        </div>
+
+        <a th:href="@{/reviews/view(bookId=${book.id})}" class="details-link">View Details</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

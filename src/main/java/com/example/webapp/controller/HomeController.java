@@ -1,6 +1,7 @@
 package com.example.webapp.controller;
-
 import com.example.webapp.model.Book;
+import com.example.webapp.model.Review;
+
 import com.example.webapp.model.User;
 import com.example.webapp.repository.BookRepository;
 import com.example.webapp.repository.UserRepository;
@@ -24,18 +25,25 @@ public class HomeController {
     @GetMapping("/home")
     public String home(Authentication authentication, Model model) {
         if (authentication != null) {
-            String username = authentication.getName();  // Obține utilizatorul conectat
-            model.addAttribute("username", username);  // Adaugă username-ul în model
+            String username = authentication.getName();
+            model.addAttribute("username", username);
 
-            // Găsește utilizatorul
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
 
-            // Preia cărțile favorite ale utilizatorului
             Set<Book> favoriteBooks = user.getFavoriteBooks();
+
+            // Calculează ratingul mediu pentru fiecare carte favorită
+            for (Book book : favoriteBooks) {
+                double averageRating = book.getReviews().stream()
+                        .mapToInt(Review::getRating)
+                        .average()
+                        .orElse(0.0);
+                book.setAverageRating(averageRating);
+            }
+
             model.addAttribute("books", favoriteBooks);
 
-            // Dacă nu există cărți favorite, adaugă un mesaj
             if (favoriteBooks.isEmpty()) {
                 model.addAttribute("message", "You have no favorite books.");
             }
@@ -43,6 +51,6 @@ public class HomeController {
             model.addAttribute("message", "You need to log in to see your favorite books.");
         }
 
-        return "home";  // Returnează pagina home.html
+        return "home";
     }
 }

@@ -1,6 +1,7 @@
 package com.example.webapp.controller;
 
 import com.example.webapp.model.Book;
+import com.example.webapp.model.Review;  // Import corect pentru Review
 import com.example.webapp.model.User;
 import com.example.webapp.repository.BookRepository;
 import com.example.webapp.repository.UserRepository;
@@ -28,13 +29,9 @@ public class BookController {
     @Autowired
     private UserRepository userRepository;
 
-    // Injectează cheia API din application.properties
     @Value("${google.books.api.key}")
     private String apiKey;
 
-    /**
-     * Metoda pentru căutarea generală a cărților.
-     */
     @GetMapping("/search")
     public String searchBooks(
             @RequestParam("query") String query,
@@ -45,10 +42,7 @@ public class BookController {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
         String url = "https://www.googleapis.com/books/v1/volumes?q=" + encodedQuery + "&maxResults=40&key=" + apiKey;
 
-        // Apel API și obține JSON ca String
         String response = restTemplate.getForObject(url, String.class);
-
-        // Parsează răspunsul JSON
         ObjectMapper mapper = new ObjectMapper();
         List<Book> books = new ArrayList<>();
 
@@ -60,8 +54,19 @@ public class BookController {
                 for (JsonNode item : items) {
                     Book book = parseBookFromJson(item);
                     if (book != null) {
-                        // Verifică dacă cartea există deja în baza de date și salveaz-o dacă nu există
-                        if (!bookRepository.existsById(book.getId())) {
+                        // Verifică dacă cartea există deja în baza de date
+                        Optional<Book> existingBook = bookRepository.findById(book.getId());
+
+                        if (existingBook.isPresent()) {
+                            // Dacă cartea există deja, adaugă recenziile locale și calculează ratingul mediu
+                            book = existingBook.get();
+                            double averageRating = book.getReviews().stream()
+                                    .mapToInt(Review::getRating)
+                                    .average()
+                                    .orElse(0.0);
+                            book.setAverageRating(averageRating);
+                        } else {
+                            // Dacă nu există, salvează cartea în baza de date fără recenzii
                             bookRepository.save(book);
                         }
                         books.add(book);
@@ -72,18 +77,15 @@ public class BookController {
             e.printStackTrace();
         }
 
-        // Adaugă cărțile în model
         model.addAttribute("books", books);
-
-        // Obține lista de bookIds din favorite
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
-
-        // Adaugă numele utilizatorului autentificat în model
         model.addAttribute("username", getUsername(authentication));
 
         return "book_search_results";
     }
+
+
 
     /**
      * Metoda pentru căutarea cărților după gen.
@@ -149,6 +151,36 @@ public class BookController {
 
         return "book_search_results";
     }
+    @GetMapping("/topBooks")
+    public String getTopBooks(Model model, Authentication authentication) {
+        // Preluăm toate cărțile din baza de date
+        List<Book> books = bookRepository.findAll();
+
+        // Calculează ratingul mediu pentru fiecare carte
+        for (Book book : books) {
+            double averageRating = book.getReviews().stream()
+                    .mapToInt(Review::getRating)
+                    .average()
+                    .orElse(0.0);
+            book.setAverageRating(averageRating);
+        }
+
+        // Sortează cărțile în funcție de rating descrescător
+        books.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
+
+        // Adaugă lista de cărți sortată în model
+        model.addAttribute("books", books);
+
+        // Obține lista de bookIds din favorite
+        Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
+        model.addAttribute("favoriteBookIds", favoriteBookIds);
+
+        // Adaugă numele utilizatorului autentificat în model
+        model.addAttribute("username", getUsername(authentication));
+
+        return "top_books";
+    }
+
 
     /**
      * Metodă auxiliară pentru parsarea unui obiect Book din JsonNode.
