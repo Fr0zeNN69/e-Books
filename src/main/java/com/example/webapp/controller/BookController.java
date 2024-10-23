@@ -35,104 +35,95 @@ public class BookController {
     @GetMapping("/search")
     public String searchBooks(
             @RequestParam(value = "query", required = false) String query,
-            @RequestParam(value = "author", required = false) String author,  // Parametru opțional pentru autor
+            @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "sort", required = false, defaultValue = "none") String sort,
-            @RequestParam(value = "order", required = false, defaultValue = "asc") String order,  // Parametru pentru ordinea sortării
+            @RequestParam(value = "order", required = false, defaultValue = "asc") String order,  // Pentru asc/desc sortare
             Model model,
             Authentication authentication) {
 
-        // Verificăm dacă atât query cât și author sunt goale
-        if ((query == null || query.trim().isEmpty()) && (author == null || author.trim().isEmpty())) {
-            model.addAttribute("error", "Please enter a search query or author.");
-            return "error_page";
-        }
-
-        // Construim URL-ul API în funcție de parametrii disponibili
-        RestTemplate restTemplate = new RestTemplate();
-        StringBuilder urlBuilder = new StringBuilder("https://www.googleapis.com/books/v1/volumes?q=");
-
-        if (query != null && !query.trim().isEmpty()) {
-            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-            urlBuilder.append(encodedQuery);
-        }
-
-        if (author != null && !author.trim().isEmpty()) {
-            String encodedAuthor = URLEncoder.encode(author, StandardCharsets.UTF_8);
-            if (urlBuilder.length() > 0) {
-                urlBuilder.append("+inauthor:").append(encodedAuthor);
-            } else {
-                urlBuilder.append("inauthor:").append(encodedAuthor);
-            }
-        }
-
-        urlBuilder.append("&maxResults=40&key=").append(apiKey);
-
-        // Apelăm API-ul Google Books
-        String response = restTemplate.getForObject(urlBuilder.toString(), String.class);
-        ObjectMapper mapper = new ObjectMapper();
         List<Book> books = new ArrayList<>();
+        boolean searchActive = false;
 
-        try {
-            JsonNode root = mapper.readTree(response);
-            JsonNode items = root.path("items");
+        // Dacă există un query sau autor pentru căutare
+        if ((query != null && !query.trim().isEmpty()) || (author != null && !author.trim().isEmpty())) {
+            searchActive = true;
 
-            if (items.isArray()) {
-                for (JsonNode item : items) {
-                    Book book = parseBookFromJson(item);
-                    if (book != null) {
-                        Optional<Book> existingBook = bookRepository.findById(book.getId());
+            // Construim URL-ul API în funcție de parametri
+            RestTemplate restTemplate = new RestTemplate();
+            StringBuilder urlBuilder = new StringBuilder("https://www.googleapis.com/books/v1/volumes?q=");
 
-                        if (existingBook.isPresent()) {
-                            // Calculăm ratingul mediu
-                            book = existingBook.get();
-                            double averageRating = book.getReviews().stream()
-                                    .mapToInt(Review::getRating)
-                                    .average()
-                                    .orElse(0.0);
-                            book.setAverageRating(averageRating);
-                        } else {
-                            // Salvăm cartea dacă nu există în baza de date
-                            bookRepository.save(book);
+            if (query != null && !query.trim().isEmpty()) {
+                String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+                urlBuilder.append(encodedQuery);
+            }
+
+            if (author != null && !author.trim().isEmpty()) {
+                String encodedAuthor = URLEncoder.encode(author, StandardCharsets.UTF_8);
+                urlBuilder.append("+inauthor:").append(encodedAuthor);
+            }
+
+            urlBuilder.append("&maxResults=40&key=").append(apiKey);
+
+            // Apelăm API-ul Google Books
+            String response = restTemplate.getForObject(urlBuilder.toString(), String.class);
+            ObjectMapper mapper = new ObjectMapper();
+
+            try {
+                JsonNode root = mapper.readTree(response);
+                JsonNode items = root.path("items");
+
+                if (items.isArray()) {
+                    for (JsonNode item : items) {
+                        Book book = parseBookFromJson(item);
+                        if (book != null) {
+                            Optional<Book> existingBook = bookRepository.findById(book.getId());
+
+                            if (existingBook.isPresent()) {
+                                book = existingBook.get();
+                                double averageRating = book.getReviews().stream()
+                                        .mapToInt(Review::getRating)
+                                        .average()
+                                        .orElse(0.0);
+                                book.setAverageRating(averageRating);
+                            } else {
+                                bookRepository.save(book);
+                            }
+                            books.add(book);
                         }
-                        books.add(book);
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            // Sortăm în funcție de parametrii
+            if (sort.equals("rating")) {
+                books.sort(Comparator.comparingDouble(Book::getAverageRating));
+            } else if (sort.equals("author")) {
+                books.sort(Comparator.comparing(Book::getAuthors));
+            } else if (sort.equals("title")) {
+                books.sort(Comparator.comparing(Book::getTitle));
+            }
+
+            // Inversăm ordinea dacă e nevoie
+            if (order.equals("desc")) {
+                Collections.reverse(books);
+            }
         }
 
-        // Comparator pentru sortare
-        Comparator<Book> comparator = Comparator.comparing(Book::getTitle);  // Implicit, sortăm după titlu
-
-        if (sort.equals("rating")) {
-            comparator = Comparator.comparingDouble(Book::getAverageRating);
-        } else if (sort.equals("author")) {
-            comparator = Comparator.comparing(Book::getAuthors);
-        } else if (sort.equals("title")) {
-            comparator = Comparator.comparing(Book::getTitle);
-        }
-
-        // Verificăm ordinea (crescător/descrescător)
-        if (order.equals("desc")) {
-            comparator = comparator.reversed();
-        }
-
-        // Sortăm lista de cărți
-        books.sort(comparator);
-
-        // Adăugăm atributele necesare pentru view
         model.addAttribute("books", books);
         model.addAttribute("query", query);
         model.addAttribute("author", author);
-        model.addAttribute("sort", sort);  // Trimitem tipul de sortare
+        model.addAttribute("sort", sort);
         model.addAttribute("order", order);  // Trimitem și ordinea
+        model.addAttribute("searchActive", searchActive);  // Indicator dacă căutarea este activă
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
         model.addAttribute("username", getUsername(authentication));
 
         return "book_search_results";
     }
+
 
 
 

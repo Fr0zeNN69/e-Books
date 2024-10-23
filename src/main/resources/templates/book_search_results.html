@@ -3,11 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Search Results</title>
+  <title th:text="${query != null && !query.isEmpty()} ? 'Results for: ' + ${query} : 'Book Search'">Book Search Results</title>
   <link href="/css/styles.css" rel="stylesheet">
-  <!-- Include Font Awesome pentru iconițe -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <!-- CSRF tokens accessed directly from the request -->
   <meta name="_csrf" content="[[${#request.getAttribute('_csrf').token}]]"/>
   <meta name="_csrf_header" content="[[${#request.getAttribute('_csrf').headerName}]]"/>
 </head>
@@ -16,15 +13,10 @@
 <!-- Include navbar -->
 <div th:replace="navbar.html"></div>
 
-<!-- Container principal pentru rezultate -->
 <div class="container">
-  <h2 class="section-title">Search Results</h2>
+  <h2 class="section-title" th:text="${query != null && !query.isEmpty()} ? 'Results for: ' + ${query} : 'Book Search'">Search Results</h2>
 
-  <!-- Verifică dacă există cărți în lista books -->
-  <div th:if="${#lists.isEmpty(books)}" class="no-results">
-    <p>No books found for your query.</p>
-  </div>
-
+  <!-- Form pentru filtrare și sortare -->
   <form action="/search" method="get" class="filter-form">
     <div>
       <label for="query">Title:</label>
@@ -57,74 +49,38 @@
     <button type="submit">Search</button>
   </form>
 
+  <!-- Afișare doar dacă există căutare activă și cărți -->
+  <div th:if="${searchActive}">
+    <div th:if="${#lists.isEmpty(books)}" class="no-results">
+      <p>No books found for your query.</p>
+    </div>
 
+    <!-- Afișare lista de cărți doar dacă există rezultate -->
+    <div th:unless="${#lists.isEmpty(books)}">
+      <ul class="book-list">
+        <li class="book-item" th:each="book : ${books}">
+          <button class="favorite-button" th:data-book-id="${book.id}" th:classappend="${favoriteBookIds.contains(book.id)} ? ' favorited' : ''">
+            <i class="fas fa-heart"></i>
+          </button>
+          <h3 th:text="${book.title}">Titlu carte</h3>
+          <p><strong>Author:</strong> <span th:text="${book.authors}">Author</span></p>
+          <p><strong>Genre:</strong> <span th:text="${book.categories}">Categorie</span></p>
+          <p><strong>Description:</strong> <span th:text="${book.description}">Descriere</span></p>
 
-  <!-- Afișează lista de cărți -->
-  <div th:unless="${#lists.isEmpty(books)}">
-    <ul class="book-list">
-      <li class="book-item" th:each="book : ${books}">
-        <button class="favorite-button" th:data-book-id="${book.id}" th:classappend="${favoriteBookIds.contains(book.id)} ? ' favorited' : ''">
-          <i class="fas fa-heart"></i>
-        </button>
-        <h3 th:text="${book.title}">Titlu carte</h3>
-        <p><strong>Autor:</strong> <span th:text="${book.authors}">Autor</span></p>
-        <p><strong>Gen:</strong> <span th:text="${book.categories}">Categorie</span></p>
-        <p><strong>Descriere:</strong> <span th:text="${book.description}">Descriere</span></p>
-
-        <!-- Rating mediu -->
-        <div class="rating">
+          <!-- Rating mediu -->
+          <div class="rating">
             <span th:each="i : ${#numbers.sequence(1, 5)}">
-                <i th:class="${i <= book.averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
+              <i th:class="${i <= book.averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
             </span>
-          <span th:text="'(' + ${T(java.lang.String).format('%.1f', book.averageRating)} + ' / 5)'"></span>
-        </div>
+            <span th:text="'(' + ${T(java.lang.String).format('%.1f', book.averageRating)} + ' / 5)'"></span>
+          </div>
 
-        <a th:href="@{/reviews/view(bookId=${book.id})}" class="details-link">View Details</a>
-      </li>
-    </ul>
-
+          <a th:href="@{/reviews/view(bookId=${book.id})}" class="details-link">View Details</a>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
-
-<!-- Script JavaScript pentru gestionarea butonului de favorite -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const favoriteButtons = document.querySelectorAll('.favorite-button');
-
-    favoriteButtons.forEach(function(button) {
-      button.addEventListener('click', function(event) {
-        const bookId = this.getAttribute('data-book-id');
-        const isFavorited = this.classList.contains('favorited');
-        const url = isFavorited ? '/users/favorites/remove' : '/users/favorites/add';
-        const formData = new FormData();
-        formData.append('bookId', bookId);
-
-        fetch(url, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        })
-                .then(response => {
-                  if (!response.ok) {
-                    console.error('Serverul a returnat o eroare:', response.status, response.statusText);
-                    throw new Error('Răspunsul rețelei nu este OK');
-                  }
-                  return response.text();
-                })
-                .then(data => {
-                  // Schimbă starea butonului
-                  this.classList.toggle('favorited');
-
-                  // Logică suplimentară dacă este necesar
-                })
-                .catch(error => console.error('Eroare:', error));
-      });
-    });
-  });
-
-</script>
 
 </body>
 </html>
