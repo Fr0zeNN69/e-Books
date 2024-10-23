@@ -29,6 +29,11 @@
     </div>
 
     <div>
+      <label for="genre">Genre:</label>
+      <input type="text" id="genre" name="genre" placeholder="Genre" th:value="${genre}" />
+    </div>
+
+    <div>
       <label for="sort">Sort by:</label>
       <select name="sort">
         <option value="none" th:selected="${sort == 'none'}">No Sort</option>
@@ -48,6 +53,7 @@
 
     <button type="submit">Search</button>
   </form>
+
 
   <!-- Afișare doar dacă există căutare activă și cărți -->
   <div th:if="${searchActive}">

@@ -38,14 +38,18 @@ public class BookController {
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "sort", required = false, defaultValue = "none") String sort,
             @RequestParam(value = "order", required = false, defaultValue = "asc") String order,  // Pentru asc/desc sortare
+            @RequestParam(value = "genre", required = false) String genre, // Adăugăm sortarea după gen
             Model model,
             Authentication authentication) {
 
         List<Book> books = new ArrayList<>();
         boolean searchActive = false;
 
-        // Dacă există un query sau autor pentru căutare
-        if ((query != null && !query.trim().isEmpty()) || (author != null && !author.trim().isEmpty())) {
+        // Dacă există un query, autor sau gen pentru căutare
+        if ((query != null && !query.trim().isEmpty()) ||
+                (author != null && !author.trim().isEmpty()) ||
+                (genre != null && !genre.trim().isEmpty())) {
+
             searchActive = true;
 
             // Construim URL-ul API în funcție de parametri
@@ -60,6 +64,11 @@ public class BookController {
             if (author != null && !author.trim().isEmpty()) {
                 String encodedAuthor = URLEncoder.encode(author, StandardCharsets.UTF_8);
                 urlBuilder.append("+inauthor:").append(encodedAuthor);
+            }
+
+            if (genre != null && !genre.trim().isEmpty()) {
+                String encodedGenre = URLEncoder.encode(genre, StandardCharsets.UTF_8);
+                urlBuilder.append("+subject:").append(encodedGenre);
             }
 
             urlBuilder.append("&maxResults=40&key=").append(apiKey);
@@ -103,6 +112,8 @@ public class BookController {
                 books.sort(Comparator.comparing(Book::getAuthors));
             } else if (sort.equals("title")) {
                 books.sort(Comparator.comparing(Book::getTitle));
+            } else if (sort.equals("category")) {
+                books.sort(Comparator.comparing(Book::getCategories));
             }
 
             // Inversăm ordinea dacă e nevoie
@@ -116,6 +127,7 @@ public class BookController {
         model.addAttribute("author", author);
         model.addAttribute("sort", sort);
         model.addAttribute("order", order);  // Trimitem și ordinea
+        model.addAttribute("genre", genre);  // Trimitem și genul
         model.addAttribute("searchActive", searchActive);  // Indicator dacă căutarea este activă
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
@@ -125,102 +137,6 @@ public class BookController {
     }
 
 
-
-
-
-    /**
-     * Metoda pentru sortarea cărților.
-     */
-    private void sortBooks(List<Book> books, String sortBy, String order) {
-        Comparator<Book> comparator;
-
-        // Definirea criteriului de sortare
-        switch (sortBy.toLowerCase()) {
-            case "title":
-                comparator = Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER);
-                break;
-            case "date":
-                comparator = Comparator.comparing(Book::getPublishDate);
-                break;
-            case "rating":
-            default:
-                comparator = Comparator.comparingDouble(Book::getAverageRating);
-                break;
-        }
-
-        // Verifică dacă se dorește sortarea descrescătoare
-        if ("desc".equalsIgnoreCase(order)) {
-            comparator = comparator.reversed();
-        }
-
-        // Sortează lista de cărți
-        books.sort(comparator);
-    }
-
-    /**
-     * Metoda pentru căutarea cărților după gen.
-     */
-    @GetMapping("/searchByGenre")
-    public String searchBooksByGenre(
-            @RequestParam("genre") String genre,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            Model model,
-            Authentication authentication) {
-
-        RestTemplate restTemplate = new RestTemplate();
-        String encodedGenre = URLEncoder.encode(genre, StandardCharsets.UTF_8);
-        int maxResults = 40; // Maxim 40 pe cerere
-        int startIndex = page * maxResults;
-        String url = "https://www.googleapis.com/books/v1/volumes?q=subject:" + encodedGenre +
-                "&maxResults=" + maxResults + "&startIndex=" + startIndex + "&key=" + apiKey;
-
-        // Apel API și prelucrare răspuns
-        String response = restTemplate.getForObject(url, String.class);
-        ObjectMapper mapper = new ObjectMapper();
-        List<Book> books = new ArrayList<>();
-        int totalItems = 0;
-
-        try {
-            JsonNode root = mapper.readTree(response);
-            totalItems = root.path("totalItems").asInt();
-            JsonNode items = root.path("items");
-
-            if (items.isArray()) {
-                for (JsonNode item : items) {
-                    Book book = parseBookFromJson(item);
-                    if (book != null && containsDesiredGenre(book, genre)) {
-                        // Verifică dacă cartea există deja în baza de date și salveaz-o dacă nu există
-                        if (!bookRepository.existsById(book.getId())) {
-                            bookRepository.save(book);
-                        }
-                        books.add(book);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Adaugă cărțile în model
-        model.addAttribute("books", books);
-
-        // Calculă numărul total de pagini
-        int totalPages = (int) Math.ceil((double) totalItems / maxResults);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-
-        // Obține lista de bookIds din favorite
-        Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
-        model.addAttribute("favoriteBookIds", favoriteBookIds);
-
-        // Adaugă genul în model pentru afișare
-        model.addAttribute("genre", genre);
-
-        // Adaugă numele utilizatorului autentificat în model
-        model.addAttribute("username", getUsername(authentication));
-
-        return "book_search_results";
-    }
 
     @GetMapping("/topBooks")
     public String getTopBooks(Model model, Authentication authentication) {

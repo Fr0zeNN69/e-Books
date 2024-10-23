@@ -12,7 +12,7 @@
     <div id="menu-button">
         <i class="fas fa-bars"></i> <!-- Iconiță pentru meniu -->
     </div>
-    <h1><a href="/home" style="text-decoration: none; color: white;">Books</a></h1>
+    <h1><a href="/home" style="text-decoration: none; color: white;">e-Books</a></h1>
 
     <div class="navbar-right"> <!-- Wrapper pentru partea dreaptă -->
         <div class="user-menu">
@@ -42,10 +42,11 @@
     <a th:href="@{/search?query=}">Search</a>
     <a th:href="@{/topBooks}">Top books</a>
     <a href="#">Hottest Topics</a>
-    <a th:href="@{/searchByGenre(genre='Fiction')}">Fiction</a>
-    <a th:href="@{/searchByGenre(genre='History')}">History</a>
-    <a th:href="@{/searchByGenre(genre='Humor')}">Humor</a>
-    <a th:href="@{/searchByGenre(genre='Art')}">Arts</a>
+    <a th:href="@{/search?genre=Fiction}">Fiction</a> <!-- Caută și sortează după Fiction -->
+    <a th:href="@{/search?genre=History}">History</a> <!-- Caută și sortează după History -->
+    <a th:href="@{/search?genre=Humor}">Humor</a> <!-- Caută și sortează după Humor -->
+    <a th:href="@{/search?genre=Art}">Arts</a> <!-- Caută și sortează după Arts -->
+
 </div>
 
 <!-- Include scriptul extern pentru navigație -->
