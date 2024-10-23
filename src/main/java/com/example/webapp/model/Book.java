@@ -1,6 +1,8 @@
 package com.example.webapp.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 @Entity
@@ -14,6 +16,8 @@ public class Book {
     @Column(columnDefinition="TEXT")
     private String description;
     private String categories;
+    private LocalDate publishDate;
+
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
@@ -77,5 +81,13 @@ public class Book {
 
     public void setAverageRating(double averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public LocalDate getPublishDate() {
+        return publishDate;
+    }
+
+    public void setPublishDate(LocalDate publishDate) {
+        this.publishDate = publishDate;
     }
 }

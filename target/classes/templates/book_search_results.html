@@ -25,6 +25,40 @@
     <p>No books found for your query.</p>
   </div>
 
+  <form action="/search" method="get" class="filter-form">
+    <div>
+      <label for="query">Title:</label>
+      <input type="text" id="query" name="query" placeholder="Book title" th:value="${query}" />
+    </div>
+
+    <div>
+      <label for="author">Author:</label>
+      <input type="text" id="author" name="author" placeholder="Author" th:value="${author}" />
+    </div>
+
+    <div>
+      <label for="sort">Sort by:</label>
+      <select name="sort">
+        <option value="none" th:selected="${sort == 'none'}">No Sort</option>
+        <option value="rating" th:selected="${sort == 'rating'}">Rating</option>
+        <option value="author" th:selected="${sort == 'author'}">Author</option>
+        <option value="title" th:selected="${sort == 'title'}">Title</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="order">Order:</label>
+      <select name="order">
+        <option value="asc" th:selected="${order == 'asc'}">Ascending</option>
+        <option value="desc" th:selected="${order == 'desc'}">Descending</option>
+      </select>
+    </div>
+
+    <button type="submit">Search</button>
+  </form>
+
+
+
   <!-- Afișează lista de cărți -->
   <div th:unless="${#lists.isEmpty(books)}">
     <ul class="book-list">

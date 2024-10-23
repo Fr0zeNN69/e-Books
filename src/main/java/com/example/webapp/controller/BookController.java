@@ -34,15 +34,41 @@ public class BookController {
 
     @GetMapping("/search")
     public String searchBooks(
-            @RequestParam("query") String query,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "author", required = false) String author,  // Parametru opțional pentru autor
+            @RequestParam(value = "sort", required = false, defaultValue = "none") String sort,
+            @RequestParam(value = "order", required = false, defaultValue = "asc") String order,  // Parametru pentru ordinea sortării
             Model model,
             Authentication authentication) {
 
-        RestTemplate restTemplate = new RestTemplate();
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-        String url = "https://www.googleapis.com/books/v1/volumes?q=" + encodedQuery + "&maxResults=40&key=" + apiKey;
+        // Verificăm dacă atât query cât și author sunt goale
+        if ((query == null || query.trim().isEmpty()) && (author == null || author.trim().isEmpty())) {
+            model.addAttribute("error", "Please enter a search query or author.");
+            return "error_page";
+        }
 
-        String response = restTemplate.getForObject(url, String.class);
+        // Construim URL-ul API în funcție de parametrii disponibili
+        RestTemplate restTemplate = new RestTemplate();
+        StringBuilder urlBuilder = new StringBuilder("https://www.googleapis.com/books/v1/volumes?q=");
+
+        if (query != null && !query.trim().isEmpty()) {
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+            urlBuilder.append(encodedQuery);
+        }
+
+        if (author != null && !author.trim().isEmpty()) {
+            String encodedAuthor = URLEncoder.encode(author, StandardCharsets.UTF_8);
+            if (urlBuilder.length() > 0) {
+                urlBuilder.append("+inauthor:").append(encodedAuthor);
+            } else {
+                urlBuilder.append("inauthor:").append(encodedAuthor);
+            }
+        }
+
+        urlBuilder.append("&maxResults=40&key=").append(apiKey);
+
+        // Apelăm API-ul Google Books
+        String response = restTemplate.getForObject(urlBuilder.toString(), String.class);
         ObjectMapper mapper = new ObjectMapper();
         List<Book> books = new ArrayList<>();
 
@@ -54,11 +80,10 @@ public class BookController {
                 for (JsonNode item : items) {
                     Book book = parseBookFromJson(item);
                     if (book != null) {
-                        // Verifică dacă cartea există deja în baza de date
                         Optional<Book> existingBook = bookRepository.findById(book.getId());
 
                         if (existingBook.isPresent()) {
-                            // Dacă cartea există deja, adaugă recenziile locale și calculează ratingul mediu
+                            // Calculăm ratingul mediu
                             book = existingBook.get();
                             double averageRating = book.getReviews().stream()
                                     .mapToInt(Review::getRating)
@@ -66,7 +91,7 @@ public class BookController {
                                     .orElse(0.0);
                             book.setAverageRating(averageRating);
                         } else {
-                            // Dacă nu există, salvează cartea în baza de date fără recenzii
+                            // Salvăm cartea dacă nu există în baza de date
                             bookRepository.save(book);
                         }
                         books.add(book);
@@ -77,7 +102,31 @@ public class BookController {
             e.printStackTrace();
         }
 
+        // Comparator pentru sortare
+        Comparator<Book> comparator = Comparator.comparing(Book::getTitle);  // Implicit, sortăm după titlu
+
+        if (sort.equals("rating")) {
+            comparator = Comparator.comparingDouble(Book::getAverageRating);
+        } else if (sort.equals("author")) {
+            comparator = Comparator.comparing(Book::getAuthors);
+        } else if (sort.equals("title")) {
+            comparator = Comparator.comparing(Book::getTitle);
+        }
+
+        // Verificăm ordinea (crescător/descrescător)
+        if (order.equals("desc")) {
+            comparator = comparator.reversed();
+        }
+
+        // Sortăm lista de cărți
+        books.sort(comparator);
+
+        // Adăugăm atributele necesare pentru view
         model.addAttribute("books", books);
+        model.addAttribute("query", query);
+        model.addAttribute("author", author);
+        model.addAttribute("sort", sort);  // Trimitem tipul de sortare
+        model.addAttribute("order", order);  // Trimitem și ordinea
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
         model.addAttribute("username", getUsername(authentication));
@@ -86,6 +135,36 @@ public class BookController {
     }
 
 
+
+
+    /**
+     * Metoda pentru sortarea cărților.
+     */
+    private void sortBooks(List<Book> books, String sortBy, String order) {
+        Comparator<Book> comparator;
+
+        // Definirea criteriului de sortare
+        switch (sortBy.toLowerCase()) {
+            case "title":
+                comparator = Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER);
+                break;
+            case "date":
+                comparator = Comparator.comparing(Book::getPublishDate);
+                break;
+            case "rating":
+            default:
+                comparator = Comparator.comparingDouble(Book::getAverageRating);
+                break;
+        }
+
+        // Verifică dacă se dorește sortarea descrescătoare
+        if ("desc".equalsIgnoreCase(order)) {
+            comparator = comparator.reversed();
+        }
+
+        // Sortează lista de cărți
+        books.sort(comparator);
+    }
 
     /**
      * Metoda pentru căutarea cărților după gen.
@@ -151,6 +230,7 @@ public class BookController {
 
         return "book_search_results";
     }
+
     @GetMapping("/topBooks")
     public String getTopBooks(Model model, Authentication authentication) {
         // Preluăm toate cărțile din baza de date
@@ -181,7 +261,6 @@ public class BookController {
         return "top_books";
     }
 
-
     /**
      * Metodă auxiliară pentru parsarea unui obiect Book din JsonNode.
      */
@@ -198,7 +277,7 @@ public class BookController {
         if (!titleNode.isMissingNode()) {
             book.setTitle(titleNode.asText());
         } else {
-            book.setTitle("Titlu necunoscut");
+            book.setTitle("Unknown Title");
         }
 
         // Extrage autorii
@@ -210,13 +289,13 @@ public class BookController {
             }
             book.setAuthors(String.join(", ", authorsList));
         } else {
-            book.setAuthors("Autor necunoscut");
+            book.setAuthors("Unknown Author");
         }
 
         // Extrage descrierea cărții
         String description = item.path("volumeInfo").path("description").asText(null);
         if (description == null || description.isEmpty()) {
-            description = "Descriere indisponibilă.";
+            description = "Description not available.";
         }
         book.setDescription(description);
 
@@ -229,7 +308,7 @@ public class BookController {
             }
             book.setCategories(String.join(", ", categoriesList));
         } else {
-            book.setCategories("Categorie necunoscută");
+            book.setCategories("Unknown Category");
         }
 
         return book;

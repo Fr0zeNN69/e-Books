@@ -286,3 +286,56 @@ a.details-link {
 .favorite-button.favorited {
     color: red;
 }
+
+/* Filter form minimal styling */
+.filter-form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;  /* Un fundal subtil */
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);  /* O umbră subtilă */
+}
+
+.filter-form label {
+    font-size: 14px;
+    color: #333;
+    margin-right: 5px;
+}
+
+.filter-form input,
+.filter-form select {
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: auto;  /* Se ajustează în funcție de conținut */
+}
+
+.filter-form button {
+    padding: 6px 12px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.filter-form button:hover {
+    background-color: #2980b9;
+}
+
+@media (max-width: 768px) {
+    .filter-form {
+        flex-wrap: wrap;
+    }
+
+    .filter-form label {
+        margin-bottom: 5px;
+    }
+}
