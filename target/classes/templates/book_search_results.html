@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Book Search Results</title>
   <link href="/css/styles.css" rel="stylesheet">
-  <link href="/css/book_search_results.css" rel="stylesheet">
+
 </head>
 <body>
 
 <!-- Include direct navbar din templates -->
-<div th:include="navbar.html"></div>
+
+<div th:replace="navbar.html"></div>
+
 
 
 <!-- Container principal pentru rezultate -->
@@ -27,14 +29,9 @@
     <ul class="book-list">
       <li class="book-item" th:each="book : ${books}">
         <h3 th:text="${book.title}">Book Title</h3>
-        <p th:if="${book.authors != null}">
-          By: <span th:text="${book.authors}">Authors</span>
-        </p>
-
-        <p th:unless="${book.authors != null}">Authors information not available</p>
-
+        <p><strong>Author:</strong> <span th:text="${book.authors}">Author</span></p>
+        <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
         <a th:href="@{/book/details/{id}(id=${book.id})}" class="details-link">View Details</a>
-        <hr>
       </li>
     </ul>
   </div>

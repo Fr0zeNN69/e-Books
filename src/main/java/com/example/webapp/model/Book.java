@@ -13,7 +13,9 @@ public class Book {
 
     private String title;
     private String authors;
+    @Column(columnDefinition="TEXT")
     private String description;
+
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();

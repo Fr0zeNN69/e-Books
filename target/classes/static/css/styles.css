@@ -157,7 +157,7 @@ body {
     text-align: center;
 }
 
-.welcome-message {
+.fav-books-message {
     font-size: 28px;
     font-weight: 600;
     color: #2c3e50;
@@ -166,14 +166,15 @@ body {
 
 /* Stilizare pentru lista de cărți */
 .book-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column; /* Asigură că elementele sunt în coloană */
+    gap: 20px; /* Adaugă un spațiu între cărți */
 }
 
 .book-item {
-    width: 300px;
     padding: 20px;
     background-color: #ecf0f1;
     border-radius: 10px;
@@ -186,6 +187,7 @@ body {
     transform: translateY(-5px);
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
 }
+
 
 .book-item h3 {
     font-size: 20px;
@@ -218,7 +220,7 @@ footer p {
 #side-menu {
     position: fixed;
     left: -250px; /* Ascunde meniul inițial în afara ecranului */
-    top: 0;
+    top: 20px;
     width: 250px;
     height: 100%;
     background-color: #2c3e50;
@@ -248,4 +250,14 @@ footer p {
 .container.menu-open {
     transform: translateX(250px); /* Mută conținutul în dreapta când meniul e deschis */
     transition: transform 0.3s ease;
+}
+a.details-link {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    text-decoration: none;
+    border-radius: 5px;
+    align-self: flex-start; /* Asigură că butonul se află jos */
 }

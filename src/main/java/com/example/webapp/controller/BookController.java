@@ -4,7 +4,7 @@ import com.example.webapp.model.Book;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication; // Adăugat importul corect
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +43,7 @@ public class BookController {
                     book.setId(item.path("id").asText());
                     book.setTitle(item.path("volumeInfo").path("title").asText());
 
+                    // Extrage autorii
                     JsonNode authorsNode = item.path("volumeInfo").path("authors");
                     if (authorsNode.isArray()) {
                         List<String> authorsList = new ArrayList<>();
@@ -54,6 +55,16 @@ public class BookController {
                         book.setAuthors("Unknown");
                     }
 
+                    // Extrage descrierea cărții
+                    String description = item.path("volumeInfo").path("description").asText(null);
+                    if (description == null || description.isEmpty()) {
+                        description = "Description not available.";
+                    }
+                    //System.out.println("Descrierea cărții: " + description); // Adaugă acest log pentru a verifica
+                    book.setDescription(description);
+
+
+                    // Verifică dacă cartea există deja în baza de date și salveaz-o dacă nu există
                     if (!bookRepository.existsById(book.getId())) {
                         bookRepository.save(book);
                     }

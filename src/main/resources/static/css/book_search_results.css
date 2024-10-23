@@ -1,20 +1,19 @@
-/* Lista de cărți */
 .book-list {
     list-style-type: none;
     padding: 0;
-    display: block; /* Asigură că lista este verticală */
+    margin: 0;
+    display: flex;
+    flex-direction: column; /* Asigură afișarea verticală */
+    gap: 20px; /* Distanța între elementele listei */
 }
 
 .book-item {
     padding: 15px;
     background-color: #f8f9fa;
     border-radius: 5px;
-    margin-bottom: 20px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;           /* Folosim flexbox pentru a controla layout-ul */
-    flex-direction: column;  /* Elemente în coloană (verticală) */
-    justify-content: space-between; /* Așezăm butonul la final */
-    height: 100%; /* Pentru a asigura că toate cărțile au înălțime consistentă */
+    display: block; /* Asigură afișarea verticală */
+    width: 100%;
 }
 
 .book-item h3, .book-item p {
@@ -37,7 +36,7 @@
     padding: 8px 12px;
     text-decoration: none;
     border-radius: 5px;
-    align-self: flex-start; /* Asigură că butonul se află jos */
+    align-self: flex-start;
 }
 
 .book-item a.details-link:hover {

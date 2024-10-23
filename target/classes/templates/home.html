@@ -12,17 +12,19 @@
 <div th:include="navbar.html"></div>
 
 <div class="container">
-  <p class="welcome-message">Welcome, <span th:text="${username != null ? username : 'User'}">User</span>!</p>
-  <p>Your Favorite Books</p>
+  <p class="fav-books-message">Your Favorite Books</p>
   <!-- Lista de cărți -->
-  <div th:each="book : ${books}">
-    <div class="book-item">
+  <ul class="book-list">
+    <li class="book-item" th:each="book : ${books}">
       <h3 th:text="${book.title}">Book Title</h3>
       <p><strong>Author:</strong> <span th:text="${book.authors}">Author</span></p>
       <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
-    </div>
-  </div>
+      <a th:href="@{/book/details/{id}(id=${book.id})}" class="details-link">View Details</a>
+    </li>
+  </ul>
 </div>
+
+
 
 </body>
 </html>
