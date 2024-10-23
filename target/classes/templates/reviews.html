@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Recenzii pentru <span th:text="${book.title}"></span></title>
+  <title>Reviews for <span th:text="${book.title}"></span></title>
   <link href="/css/review.css" rel="stylesheet">
-  <!-- Include Font Awesome pentru iconițe -->
+  <!-- Include Font Awesome for icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -13,18 +13,18 @@
 <div th:replace="navbar.html"></div>
 
 <div class="settings-container">
-  <h1>Recenzii pentru <span th:text="${book.title}"></span></h1>
+  <h1>Reviews for <span th:text="${book.title}"></span></h1>
 
-  <!-- Afișează ratingul mediu -->
+  <!-- Display average rating -->
   <div class="average-rating">
-    <strong>Rating Mediu:</strong>
+    <strong>Average Rating:</strong>
     <span th:text="${T(java.lang.String).format('%.1f', averageRating)}">0.0</span> / 5
     <span class="stars" th:each="i : ${#numbers.sequence(1, 5)}">
             <i th:class="${i <= averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
         </span>
   </div>
 
-  <!-- Afișează mesajele de eroare sau succes -->
+  <!-- Display error or success messages -->
   <div th:if="${error}" class="alert error">
     <p th:text="${error}"></p>
   </div>
@@ -32,15 +32,15 @@
     <p th:text="${success}"></p>
   </div>
 
-  <!-- Afișează Detaliile Cărții -->
+  <!-- Display Book Details -->
   <div class="book-info">
-    <p><strong>Titlu:</strong> <span th:text="${book.title}">Titlu</span></p>
-    <p><strong>Autori:</strong> <span th:text="${book.authors}">Autori</span></p>
-    <p><strong>Descriere:</strong> <span th:text="${book.description}">Descriere</span></p>
-    <p><strong>Categorii:</strong> <span th:text="${book.categories}">Categorii</span></p>
+    <p><strong>Title:</strong> <span th:text="${book.title}">Title</span></p>
+    <p><strong>Authors:</strong> <span th:text="${book.authors}">Authors</span></p>
+    <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
+    <p><strong>Categories:</strong> <span th:text="${book.categories}">Categories</span></p>
   </div>
 
-  <!-- Afișează Recenziile -->
+  <!-- Display Reviews -->
   <div th:each="review : ${reviews}">
     <div class="review">
       <h3 th:text="${review.username}"></h3>
@@ -51,45 +51,46 @@
         <span th:text="'(' + ${review.rating} + ' / 5)'"></span>
       </div>
       <p th:text="${review.reviewText}"></p>
-      <p>Data recenziei: <span th:text="${review.reviewDate}"></span></p>
+      <p>Review Date: <span th:text="${review.reviewDate}"></span></p>
     </div>
     <hr>
   </div>
 
-  <!-- Formularul de Adăugare a unei Recenzii -->
-  <h2>Adaugă o recenzie:</h2>
+  <!-- Add a Review Form -->
+  <h2>Add a Review:</h2>
   <form th:action="@{/reviews/add}" method="post">
     <input type="hidden" name="bookId" th:value="${book.id}">
 
     <div class="form-group">
-      <label for="reviewText">Recenzie:</label>
-      <textarea id="reviewText" name="reviewText" placeholder="Scrie recenzia ta..." required></textarea>
+      <label for="reviewText">Review:</label>
+      <textarea id="reviewText" name="reviewText" placeholder="Write your review..." required></textarea>
     </div>
 
     <div class="form-group">
-      <label for="rating">Evaluare:</label>
+      <label for="rating">Rating:</label>
       <div class="star-rating">
         <input type="radio" id="star5" name="rating" value="5" required />
-        <label for="star5" title="5 stele">&#9733;</label>
+        <label for="star5" title="5 stars">&#9733;</label>
 
         <input type="radio" id="star4" name="rating" value="4" />
-        <label for="star4" title="4 stele">&#9733;</label>
+        <label for="star4" title="4 stars">&#9733;</label>
 
         <input type="radio" id="star3" name="rating" value="3" />
-        <label for="star3" title="3 stele">&#9733;</label>
+        <label for="star3" title="3 stars">&#9733;</label>
 
         <input type="radio" id="star2" name="rating" value="2" />
-        <label for="star2" title="2 stele">&#9733;</label>
+        <label for="star2" title="2 stars">&#9733;</label>
 
         <input type="radio" id="star1" name="rating" value="1" />
-        <label for="star1" title="1 stea">&#9733;</label>
+        <label for="star1" title="1 star">&#9733;</label>
       </div>
     </div>
 
-    <button type="submit" class="btn">Adaugă Recenzie</button>
+    <button type="submit" class="btn">Submit Review</button>
   </form>
 
-  <a href="/home" class="btn">Înapoi la home</a>
+  <button class="btn" onclick="window.history.back()">Go Back</button>
+
 </div>
 
 </body>
