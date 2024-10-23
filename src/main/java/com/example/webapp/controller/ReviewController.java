@@ -6,6 +6,7 @@ import com.example.webapp.repository.BookRepository;
 import com.example.webapp.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,17 +24,32 @@ public class ReviewController {
     @Autowired
     private BookRepository bookRepository;  // Injectează repository-ul pentru Book
 
-    // Adaugă o nouă recenzie
+    /**
+     * Adaugă o nouă recenzie
+     */
     @PostMapping("/add")
     public String addReview(@RequestParam("bookId") String bookId,
                             @RequestParam("reviewText") String reviewText,
                             @RequestParam("rating") int rating,
-                            Authentication authentication) {
+                            Authentication authentication, Model model) {
         String username = authentication.getName();
+
+        // Validare rating
+        if (rating < 1 || rating > 5) {
+            model.addAttribute("error", "Ratingul trebuie să fie între 1 și 5 stele.");
+            return "redirect:/reviews/view?bookId=" + bookId;
+        }
 
         // Găsește cartea pe baza ID-ului
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + bookId));
+
+        // Previne adăugarea mai multor recenzii pentru aceeași carte de către același utilizator
+        List<Review> existingReviews = reviewRepository.findByBookIdAndUsername(bookId, username);
+        if (!existingReviews.isEmpty()) {
+            model.addAttribute("error", "Ai deja o recenzie pentru această carte.");
+            return "redirect:/reviews/view?bookId=" + bookId;
+        }
 
         // Creează recenzia
         Review review = new Review();
@@ -49,7 +65,9 @@ public class ReviewController {
         return "redirect:/reviews/view?bookId=" + bookId;
     }
 
-    // Vizualizează recenziile pentru o anumită carte
+    /**
+     * Vizualizează recenziile pentru o anumită carte
+     */
     @GetMapping("/view")
     public String viewReviews(@RequestParam("bookId") String bookId, Model model) {
         // Găsește cartea pe baza ID-ului
@@ -57,11 +75,18 @@ public class ReviewController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + bookId));
 
         // Găsește recenziile asociate cărții
-        List<Review> reviews = book.getReviews();
+        List<Review> reviews = reviewRepository.findByBookId(bookId);
+
+        // Calculează ratingul mediu
+        double averageRating = 0.0;
+        if (!reviews.isEmpty()) {
+            averageRating = reviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
+        }
 
         // Adaugă informațiile necesare în model
         model.addAttribute("reviews", reviews);
         model.addAttribute("book", book);
+        model.addAttribute("averageRating", averageRating);
 
         return "reviews";  // Afișează pagina reviews.html
     }

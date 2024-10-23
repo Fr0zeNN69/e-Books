@@ -2,42 +2,95 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Recenzii pentru <span th:text="${bookTitle}"></span></title>
-  <link href="/css/styles.css" rel="stylesheet">
+  <title>Recenzii pentru <span th:text="${book.title}"></span></title>
+  <link href="/css/review.css" rel="stylesheet">
+  <!-- Include Font Awesome pentru iconițe -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
 <!-- Include navbar -->
-<div th:replace="navbar.html :: navbar"></div>
+<div th:replace="navbar.html"></div>
 
-<h1>Recenzii pentru <span th:text="${bookTitle}"></span></h1>
+<div class="settings-container">
+  <h1>Recenzii pentru <span th:text="${book.title}"></span></h1>
 
-<div th:each="review : ${reviews}">
-  <h3 th:text="${review.username}"></h3>
-  <p th:text="${review.reviewText}"></p>
-  <p>Rating: <span th:text="${review.rating}"></span> / 5</p>
-  <p>Data recenziei: <span th:text="${review.reviewDate}"></span></p>
-  <hr>
+  <!-- Afișează ratingul mediu -->
+  <div class="average-rating">
+    <strong>Rating Mediu:</strong>
+    <span th:text="${T(java.lang.String).format('%.1f', averageRating)}">0.0</span> / 5
+    <span class="stars" th:each="i : ${#numbers.sequence(1, 5)}">
+            <i th:class="${i <= averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
+        </span>
+  </div>
+
+  <!-- Afișează mesajele de eroare sau succes -->
+  <div th:if="${error}" class="alert error">
+    <p th:text="${error}"></p>
+  </div>
+  <div th:if="${success}" class="alert success">
+    <p th:text="${success}"></p>
+  </div>
+
+  <!-- Afișează Detaliile Cărții -->
+  <div class="book-info">
+    <p><strong>Titlu:</strong> <span th:text="${book.title}">Titlu</span></p>
+    <p><strong>Autori:</strong> <span th:text="${book.authors}">Autori</span></p>
+    <p><strong>Descriere:</strong> <span th:text="${book.description}">Descriere</span></p>
+    <p><strong>Categorii:</strong> <span th:text="${book.categories}">Categorii</span></p>
+  </div>
+
+  <!-- Afișează Recenziile -->
+  <div th:each="review : ${reviews}">
+    <div class="review">
+      <h3 th:text="${review.username}"></h3>
+      <div class="rating">
+                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                    <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                </span>
+        <span th:text="'(' + ${review.rating} + ' / 5)'"></span>
+      </div>
+      <p th:text="${review.reviewText}"></p>
+      <p>Data recenziei: <span th:text="${review.reviewDate}"></span></p>
+    </div>
+    <hr>
+  </div>
+
+  <!-- Formularul de Adăugare a unei Recenzii -->
+  <h2>Adaugă o recenzie:</h2>
+  <form th:action="@{/reviews/add}" method="post">
+    <input type="hidden" name="bookId" th:value="${book.id}">
+
+    <div class="form-group">
+      <label for="reviewText">Recenzie:</label>
+      <textarea id="reviewText" name="reviewText" placeholder="Scrie recenzia ta..." required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="rating">Evaluare:</label>
+      <div class="star-rating">
+        <input type="radio" id="star5" name="rating" value="5" required />
+        <label for="star5" title="5 stele">&#9733;</label>
+
+        <input type="radio" id="star4" name="rating" value="4" />
+        <label for="star4" title="4 stele">&#9733;</label>
+
+        <input type="radio" id="star3" name="rating" value="3" />
+        <label for="star3" title="3 stele">&#9733;</label>
+
+        <input type="radio" id="star2" name="rating" value="2" />
+        <label for="star2" title="2 stele">&#9733;</label>
+
+        <input type="radio" id="star1" name="rating" value="1" />
+        <label for="star1" title="1 stea">&#9733;</label>
+      </div>
+    </div>
+
+    <button type="submit" class="btn">Adaugă Recenzie</button>
+  </form>
+
+  <a href="/home" class="btn">Înapoi la home</a>
 </div>
-
-<h2>Adaugă o recenzie:</h2>
-<form action="/reviews/add" method="post">
-  <input type="hidden" name="bookTitle" th:value="${bookTitle}">
-  <textarea name="reviewText" placeholder="Scrie recenzia ta..." required></textarea>
-  <br>
-  <label for="rating">Evaluare:</label>
-  <select name="rating" id="rating">
-    <option value="1">1 stea</option>
-    <option value="2">2 stele</option>
-    <option value="3">3 stele</option>
-    <option value="4">4 stele</option>
-    <option value="5">5 stele</option>
-  </select>
-  <br>
-  <button type="submit">Adaugă Recenzie</button>
-</form>
-
-<a href="/home">Înapoi la home</a>
 
 </body>
 </html>

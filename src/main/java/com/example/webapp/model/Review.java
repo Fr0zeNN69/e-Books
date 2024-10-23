@@ -10,24 +10,27 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    // Relația ManyToOne cu Book
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    private String username;  // Utilizatorul care a scris recenzia
-    private String reviewText;  // Textul recenziei
-    private int rating;  // Evaluarea, de la 1 la 5 stele
-    private LocalDate reviewDate;  // Data recenziei
+    private String username;
 
-    // Getters și Setters
+    @Column(length = 1000)
+    private String reviewText;
+
+    private int rating;
+
+    private LocalDate reviewDate;
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // ... alte getters și setters
 
     public Book getBook() {
         return book;

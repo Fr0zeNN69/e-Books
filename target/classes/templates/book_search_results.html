@@ -39,7 +39,8 @@
         <p><strong>Autor:</strong> <span th:text="${book.authors}">Autor</span></p>
         <p><strong>Gen:</strong> <span th:text="${book.categories}">Categorie</span></p>
         <p><strong>Descriere:</strong> <span th:text="${book.description}">Descriere</span></p>
-        <a th:href="@{/book/details/{id}(id=${book.id})}" class="details-link">View Details</a>
+        <a th:href="@{/reviews/view(bookId=${book.id})}" class="details-link">View Details</a>
+
       </li>
     </ul>
   </div>

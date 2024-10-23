@@ -1,0 +1,225 @@
+/* styles.css */
+
+/* Resetări de bază */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Stilizare Navbar */
+nav {
+    background-color: #2c3e50;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: flex-start;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #3498db;
+}
+
+.user-info {
+    color: #ecf0f1;
+    font-weight: 600;
+}
+
+/* Containerul Principal */
+.settings-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Titluri */
+.settings-container h1, .settings-container h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
+}
+
+.settings-container h2 {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Detalii Carte */
+.book-info p {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.book-info p strong {
+    color: #34495e;
+}
+
+/* Recenzii */
+.review {
+    margin-bottom: 20px;
+}
+
+.review h3 {
+    color: #34495e;
+    margin-bottom: 5px;
+}
+
+.rating i {
+    color: #f1c40f; /* Culoarea stelelor pline */
+    margin-right: 2px;
+}
+
+.average-rating {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.average-rating .stars i {
+    color: #f1c40f;
+    margin-right: 2px;
+}
+
+/* Formular */
+form {
+    margin-bottom: 40px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #34495e;
+}
+
+.form-group textarea {
+    padding: 10px 15px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    font-size: 16px;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.form-group textarea:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Stele Interactive */
+.star-rating {
+    direction: rtl;
+    display: inline-block;
+}
+
+.star-rating input[type="radio"] {
+    display: none;
+}
+
+.star-rating label {
+    font-size: 30px;
+    color: #bdc3c7;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star-rating input[type="radio"]:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #f1c40f;
+}
+
+/* Butoane */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+}
+
+/* Mesaje de eroare și succes */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsivitate */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        margin-bottom: 10px;
+    }
+
+    .settings-container {
+        padding: 20px;
+        margin: 20px;
+    }
+
+    .star-rating label {
+        font-size: 25px;
+    }
+
+    .rating i, .average-rating .stars i {
+        font-size: 20px;
+    }
+}
