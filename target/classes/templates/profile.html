@@ -3,55 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil</title>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .profile-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-
-        h2 {
-            font-size: 28px;
-            color: #333;
-        }
-
-        .profile-details {
-            margin-top: 20px;
-        }
-
-        .profile-details p {
-            font-size: 18px;
-            color: #555;
-        }
-
-    </style>
+    <title>Settings</title>
+    <link href="/css/profile.css" rel="stylesheet">
 </head>
 <body>
 
-<div class="profile-container">
-    <h2>Profil Utilizator</h2>
+<!-- Include navbar -->
+<div th:replace="navbar.html"></div>
 
-    <div class="profile-details">
-        <p>Nume: <span th:text="${user.name}">Numele utilizatorului</span></p>
-        <p>Email: <span th:text="${user.email}">Emailul utilizatorului</span></p>
-        <p>Username: <span th:text="${user.username}">Username-ul utilizatorului</span></p>
-    </div>
+<div class="settings-container">
+    <h2>Profile Settings</h2>
+
+    <!-- Update Name Section -->
+    <form th:action="@{/profile/updateName}" method="post">
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" th:value="${user.name}" required />
+        </div>
+        <div>
+            <button type="submit" class="btn">Update Name</button>
+        </div>
+    </form>
+
+    <h2>Change Password</h2>
+
+    <form th:action="@{/profile/changePassword}" method="post">
+        <div class="form-group">
+            <label for="currentPassword">Current Password:</label>
+            <input type="password" id="currentPassword" name="currentPassword" required />
+        </div>
+        <div class="form-group">
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" name="newPassword" required />
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Confirm New Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required />
+        </div>
+        <div>
+            <button type="submit" class="btn">Change Password</button>
+        </div>
+    </form>
 </div>
 
 </body>
