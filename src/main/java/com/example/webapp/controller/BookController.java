@@ -3,6 +3,7 @@ package com.example.webapp.controller;
 import com.example.webapp.model.Book;
 import com.example.webapp.model.User;
 import com.example.webapp.repository.BookRepository;
+import com.example.webapp.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import com.example.webapp.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class BookController {
@@ -65,9 +62,21 @@ public class BookController {
                     // Extrage descrierea cărții
                     String description = item.path("volumeInfo").path("description").asText(null);
                     if (description == null || description.isEmpty()) {
-                        description = "Description not available.";
+                        description = "Descriere indisponibilă.";
                     }
                     book.setDescription(description);
+
+                    // **Extrage categoriile (genurile)**
+                    JsonNode categoriesNode = item.path("volumeInfo").path("categories");
+                    if (categoriesNode.isArray()) {
+                        List<String> categoriesList = new ArrayList<>();
+                        for (JsonNode categoryNode : categoriesNode) {
+                            categoriesList.add(categoryNode.asText());
+                        }
+                        book.setCategories(String.join(", ", categoriesList));
+                    } else {
+                        book.setCategories("Categorie necunoscută");
+                    }
 
                     // Verifică dacă cartea există deja în baza de date și salveaz-o dacă nu există
                     if (!bookRepository.existsById(book.getId())) {

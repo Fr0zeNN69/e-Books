@@ -28,17 +28,21 @@
   <!-- Lista de cărți favorite -->
   <div th:unless="${#lists.isEmpty(books)}">
     <ul class="book-list">
+
       <li class="book-item" th:each="book : ${books}">
         <!-- Butonul în formă de inimă -->
         <button class="favorite-button favorited"
                 th:data-book-id="${book.id}">
           <i class="fas fa-heart"></i>
         </button>
-        <h3 th:text="${book.title}">Book Title</h3>
-        <p><strong>Author:</strong> <span th:text="${book.authors}">Author</span></p>
-        <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
+        <h3 th:text="${book.title}">Titlu carte</h3>
+        <p><strong>Autor:</strong> <span th:text="${book.authors}">Autor</span></p>
+        <p><strong>Gen:</strong> <span th:text="${book.categories}">Categorie</span></p>
+        <p><strong>Descriere:</strong> <span th:text="${book.description}">Descriere</span></p>
         <a th:href="@{/book/details/{id}(id=${book.id})}" class="details-link">View Details</a>
       </li>
+
+
     </ul>
   </div>
 </div>

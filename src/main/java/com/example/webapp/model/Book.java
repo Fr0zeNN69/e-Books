@@ -16,6 +16,8 @@ public class Book {
     @Column(columnDefinition="TEXT")
     private String description;
 
+    private String categories;
+
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
@@ -61,6 +63,13 @@ public class Book {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    public String getCategories() {
+        return categories;
+    }
+
+    public void setCategories(String categories) {
+        this.categories = categories;
     }
 
 }
