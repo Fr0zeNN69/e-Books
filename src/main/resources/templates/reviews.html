@@ -59,11 +59,14 @@
   <!-- Display Reviews -->
   <div th:each="review : ${reviews}">
     <div class="review">
-      <h3 th:text="${review.username}"></h3>
+      <!-- Link către profilul utilizatorului -->
+      <h3>
+        <a th:href="@{/profile/{username}(username=${review.username})}" th:text="${review.username}"></a>
+      </h3>
       <div class="rating">
-        <span th:each="i : ${#numbers.sequence(1, 5)}">
-          <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
-        </span>
+            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+            </span>
         <span th:text="'(' + ${review.rating} + ' / 5)'"></span>
       </div>
       <p th:text="${review.reviewText}"></p>
@@ -81,6 +84,7 @@
     </div>
     <hr>
   </div>
+
 
   <!-- Add a Review Form -->
   <h2>Add a Review:</h2>

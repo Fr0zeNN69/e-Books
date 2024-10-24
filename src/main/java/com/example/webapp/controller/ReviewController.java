@@ -66,8 +66,10 @@ public class ReviewController {
                               @RequestParam(value = "sort", defaultValue = "recent") String sort,
                               Authentication authentication,
                               Model model) {
-        String username = authentication.getName();
-        model.addAttribute("username", username);
+        // Obținem username-ul autentificat sau "Guest" dacă utilizatorul nu este autentificat
+        String currentUsername = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : "Guest";
+        model.addAttribute("currentUsername", currentUsername);
+
 
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + bookId));

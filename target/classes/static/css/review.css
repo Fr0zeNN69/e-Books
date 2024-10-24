@@ -255,3 +255,19 @@ form {
     border-radius: 5px;
     border: 1px solid #ccc;
 }
+a {
+    color: #3498db; /* Culoare standard albastră deschisă */
+    text-decoration: none; /* Elimină sublinierea */
+}
+
+a:hover {
+    color: #2980b9; /* O nuanță mai închisă la hover */
+}
+
+a:visited {
+    color: #34495e; /* O nuanță mai neutră pentru linkurile vizitate */
+}
+
+a:active {
+    color: #2980b9; /* Culoarea când linkul este apăsat */
+}

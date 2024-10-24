@@ -11,4 +11,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // Găsește recenziile pe baza ID-ului cărții și al username-ului
     List<Review> findByBookIdAndUsername(String bookId, String username);
+
+    // Găsește toate recenziile scrise de un utilizator pe baza username-ului
+    List<Review> findByUsername(String username);
 }

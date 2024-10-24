@@ -37,13 +37,20 @@ public class BookController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "sort", required = false, defaultValue = "none") String sort,
-            @RequestParam(value = "order", required = false, defaultValue = "asc") String order,  // Pentru asc/desc sortare
-            @RequestParam(value = "genre", required = false) String genre, // Adăugăm sortarea după gen
+            @RequestParam(value = "order", required = false, defaultValue = "asc") String order,
+            @RequestParam(value = "genre", required = false) String genre,
             Model model,
             Authentication authentication) {
 
         List<Book> books = new ArrayList<>();
         boolean searchActive = false;
+
+        if (authentication != null) {
+            String currentUsername = authentication.getName();
+            model.addAttribute("currentUsername", currentUsername);
+        } else {
+            model.addAttribute("currentUsername", "Guest");
+        }
 
         // Dacă există un query, autor sau gen pentru căutare
         if ((query != null && !query.trim().isEmpty()) ||
@@ -162,11 +169,17 @@ public class BookController {
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
 
-        // Adaugă numele utilizatorului autentificat în model
-        model.addAttribute("username", getUsername(authentication));
+        // Adaugă numele utilizatorului conectat în model
+        if (authentication != null && authentication.isAuthenticated()) {
+            String currentUsername = authentication.getName();
+            model.addAttribute("currentUsername", currentUsername);
+        } else {
+            model.addAttribute("currentUsername", "Guest");
+        }
 
         return "top_books";
     }
+
 
     /**
      * Metodă auxiliară pentru parsarea unui obiect Book din JsonNode.
@@ -262,7 +275,9 @@ public class BookController {
                 !authentication.getPrincipal().equals("anonymousUser")) {
             return authentication.getName();
         } else {
-            return "User";
+            return null;  // Returnăm null în loc de "User"
         }
     }
+
 }
+

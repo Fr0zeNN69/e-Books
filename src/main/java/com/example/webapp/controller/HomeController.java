@@ -1,7 +1,7 @@
 package com.example.webapp.controller;
+
 import com.example.webapp.model.Book;
 import com.example.webapp.model.Review;
-
 import com.example.webapp.model.User;
 import com.example.webapp.repository.BookRepository;
 import com.example.webapp.repository.UserRepository;
@@ -25,10 +25,10 @@ public class HomeController {
     @GetMapping("/home")
     public String home(Authentication authentication, Model model) {
         if (authentication != null) {
-            String username = authentication.getName();
-            model.addAttribute("username", username);
+            String currentUsername = authentication.getName();
+            model.addAttribute("currentUsername", currentUsername);
 
-            User user = userRepository.findByUsername(username)
+            User user = userRepository.findByUsername(currentUsername)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
 
             Set<Book> favoriteBooks = user.getFavoriteBooks();
@@ -48,9 +48,23 @@ public class HomeController {
                 model.addAttribute("message", "You have no favorite books.");
             }
         } else {
+            model.addAttribute("currentUsername", "Guest");
             model.addAttribute("message", "You need to log in to see your favorite books.");
         }
 
         return "home";
     }
+
+
+    // Metodă auxiliară pentru obținerea numelui utilizatorului autentificat
+    private String getUsername(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated() &&
+                !authentication.getPrincipal().equals("anonymousUser")) {
+            return authentication.getName();
+        } else {
+            return null;  // Returnăm null pentru utilizatori neautentificați
+        }
+    }
+
 }
+

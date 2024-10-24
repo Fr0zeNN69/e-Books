@@ -17,16 +17,20 @@
     <div class="navbar-right"> <!-- Wrapper pentru partea dreaptă -->
         <div class="user-menu">
             <button id="userButton">
-                <span th:text="${username != null ? username : 'user'}">User Name</span>
+                <i class="fas fa-user"></i> <!-- Iconiță pentru utilizator -->
+                <span th:text="${currentUsername != null ? currentUsername : 'Guest'}">Guest</span>
             </button>
-            <div class="dropdown-menu" id="userDropdown">
-                <a href="/profile">Profile</a>
+            <div class="dropdown-menu" id="userDropdown" th:if="${currentUsername != null}">
+                <a th:href="@{/profile/{username}(username=${currentUsername})}">Profile</a>
                 <a href="/logout">Logout</a>
+            </div>
+            <div th:if="${currentUsername == null}">
+                <a href="/login">Login</a>
             </div>
         </div>
 
         <div class="search-bar">
-            <button id="searchIcon"><i class="fas fa-search"></i></button> <!-- Iconiță pentru căutare -->
+            <button id="searchIcon"><i class="fas fa-search"></i></button>
             <div class="search-dropdown">
                 <form th:action="@{/search}" method="get">
                     <input type="text" name="query" placeholder="Căutare cărți..." />
@@ -34,19 +38,19 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- Meniul lateral -->
 <div id="side-menu">
     <a href="/home">Home</a>
-    <a th:href="@{/search?query=}">Search</a>
+    <a th:href="@{/search?query=}">Search Book</a>
     <a th:href="@{/topBooks}">Top books</a>
     <a href="#">Hottest Topics</a>
     <a th:href="@{/search?genre=Fiction}">Fiction</a> <!-- Caută și sortează după Fiction -->
     <a th:href="@{/search?genre=History}">History</a> <!-- Caută și sortează după History -->
     <a th:href="@{/search?genre=Humor}">Humor</a> <!-- Caută și sortează după Humor -->
     <a th:href="@{/search?genre=Art}">Arts</a> <!-- Caută și sortează după Arts -->
-
 </div>
 
 <!-- Include scriptul extern pentru navigație -->

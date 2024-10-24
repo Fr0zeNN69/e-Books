@@ -122,3 +122,34 @@ form {
         margin: 20px;
     }
 }
+/* Stil pentru toate butoanele - "Button 16" cu ajustări */
+.book-btn {
+    background-color: #e0e0e0; /* Gri deschis pentru a avea contrast pe fundal alb */
+    border: 1px solid #e0e0e0; /* Bordura se potrivește cu fundalul */
+    border-radius: 4px;
+    color: #3c4043; /* Culoare text vizibilă */
+    cursor: pointer;
+    font-family: arial, sans-serif;
+    font-size: 14px;
+    height: 36px;
+    line-height: 27px;
+    min-width: 54px;
+    padding: 0 16px;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: pre;
+}
+
+.book-btn:hover {
+    background-color: #d6d6d6; /* O nuanță mai închisă de gri pentru hover */
+    border-color: #d6d6d6; /* Menținem aceeași culoare a bordurii */
+    box-shadow: rgba(0, 0, 0, .1) 0 1px 1px;
+    color: #202124; /* Textul devine ușor mai închis la hover */
+}
+
+.book-btn:focus {
+    border-color: #202124; /* La focus, bordura devine neagră pentru contrast */
+    outline: none;
+}
