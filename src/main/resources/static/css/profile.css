@@ -14,33 +14,6 @@ body {
     line-height: 1.6;
 }
 
-/* Stilizare Navbar */
-nav {
-    background-color: #2c3e50;
-    padding: 15px 20px;
-}
-
-nav ul {
-    list-style: none;
-    display: flex;
-    justify-content: flex-start;
-}
-
-nav ul li {
-    margin-right: 20px;
-}
-
-nav ul li a {
-    color: #ecf0f1;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-nav ul li a:hover {
-    color: #3498db;
-}
-
 /* Containerul de Setări */
 .settings-container {
     max-width: 800px;
@@ -56,6 +29,19 @@ nav ul li a:hover {
     color: #2c3e50;
     border-bottom: 2px solid #ecf0f1;
     padding-bottom: 10px;
+}
+
+/* Stilizare secțiuni de tip cutie pentru Reviews și Favorites */
+.settings-section-content {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.settings-section-content ul {
+    padding-left: 20px;
 }
 
 /* Stilizare Formulare */
@@ -109,47 +95,34 @@ form {
 
 /* Responsivitate */
 @media (max-width: 768px) {
-    nav ul {
-        flex-direction: column;
-    }
-
-    nav ul li {
-        margin-bottom: 10px;
-    }
-
     .settings-container {
         padding: 20px;
         margin: 20px;
     }
 }
-/* Stil pentru toate butoanele - "Button 16" cu ajustări */
+
 .book-btn {
-    background-color: #e0e0e0; /* Gri deschis pentru a avea contrast pe fundal alb */
-    border: 1px solid #e0e0e0; /* Bordura se potrivește cu fundalul */
+    background-color: #e0e0e0;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
-    color: #3c4043; /* Culoare text vizibilă */
+    color: #3c4043;
     cursor: pointer;
-    font-family: arial, sans-serif;
     font-size: 14px;
-    height: 36px;
-    line-height: 27px;
-    min-width: 54px;
-    padding: 0 16px;
-    text-align: center;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    white-space: pre;
+    padding: 8px 16px;
+    margin-top: 20px;
 }
 
 .book-btn:hover {
-    background-color: #d6d6d6; /* O nuanță mai închisă de gri pentru hover */
-    border-color: #d6d6d6; /* Menținem aceeași culoare a bordurii */
-    box-shadow: rgba(0, 0, 0, .1) 0 1px 1px;
-    color: #202124; /* Textul devine ușor mai închis la hover */
+    background-color: #d6d6d6;
+    border-color: #d6d6d6;
+    color: #202124;
 }
 
-.book-btn:focus {
-    border-color: #202124; /* La focus, bordura devine neagră pentru contrast */
-    outline: none;
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
 }

@@ -8,6 +8,7 @@ import com.example.webapp.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,22 +58,6 @@ public class ProfileController {
     }
 
 
-    @PostMapping("/profile/updateName")
-    public String updateName(@RequestParam String name, Authentication authentication, Model model) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-            user.setName(name);
-            userRepository.save(user);
-
-            model.addAttribute("username", user.getUsername());
-            model.addAttribute("success", "Name updated successfully.");
-        }
-        return "redirect:/profile";
-    }
-
     @PostMapping("/profile/updateBio")
     public String updateBio(@RequestParam String bio, Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
@@ -85,59 +70,49 @@ public class ProfileController {
 
             model.addAttribute("username", user.getUsername());
             model.addAttribute("success", "Bio updated successfully.");
+
+            return "redirect:/profile/" + username;
         }
-        return "redirect:/profile";
+        return "redirect:/login";
     }
 
-    @PostMapping("/profile/updateProfilePicture")
-    public String updateProfilePicture(@RequestParam String profilePictureUrl, Authentication authentication, Model model) {
+
+    @PostMapping("/profile/changePassword")
+    public String changePassword(@RequestParam String oldPassword,
+                                 @RequestParam String newPassword,
+                                 @RequestParam String confirmPassword,
+                                 Authentication authentication,
+                                 Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            user.setProfilePictureUrl(profilePictureUrl);
+            // Verifică dacă parola veche este corectă (folosind PasswordEncoder)
+            if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+                model.addAttribute("error", "Old password is incorrect.");
+                return "redirect:/profile/" + username;
+            }
+
+            // Verifică dacă noua parolă și confirmarea coincid
+            if (!newPassword.equals(confirmPassword)) {
+                model.addAttribute("error", "New passwords do not match.");
+                return "redirect:/profile/" + username;
+            }
+
+            // Salvează noua parolă criptată
+            user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
 
-            model.addAttribute("username", user.getUsername());
-            model.addAttribute("success", "Profile picture updated successfully.");
+            model.addAttribute("success", "Password updated successfully.");
+            return "redirect:/profile/" + username;  // Redirecționează la profil după schimbarea parolei
         }
-        return "redirect:/profile";
+        return "redirect:/login";  // Redirecționează la login dacă utilizatorul nu este autentificat
     }
 
-    @PostMapping("/profile/updateSocialLinks")
-    public String updateSocialLinks(@RequestParam Set<String> socialLinks, Authentication authentication, Model model) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-            user.setSocialLinks(socialLinks);
-            userRepository.save(user);
-
-            model.addAttribute("username", user.getUsername());
-            model.addAttribute("success", "Social links updated successfully.");
-        }
-        return "redirect:/profile";
-    }
-
-    @GetMapping("/profile/activity")
-    public String showUserActivity(Model model, Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-            List<Review> userReviews = reviewRepository.findByUsername(username);
-            List<Book> favoriteBooks = new ArrayList<>(user.getFavoriteBooks());
-
-            model.addAttribute("user", user);
-            model.addAttribute("userReviews", userReviews);
-            model.addAttribute("favoriteBooks", favoriteBooks);
-            model.addAttribute("username", user.getUsername());
-        }
-        return "user_activity";
-    }
 
     @PostMapping("/profile/deleteAccount")
     public String deleteAccount(Authentication authentication) {
@@ -146,28 +121,43 @@ public class ProfileController {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            userRepository.delete(user);  // Șterge utilizatorul
+            // Șterge toate recenziile asociate cu utilizatorul
+            List<Review> userReviews = reviewRepository.findByUsername(username);
+            reviewRepository.deleteAll(userReviews);
+
+            // Actualizează recenziile like-uite/dislike-uite de utilizator
+            List<Review> allReviews = reviewRepository.findAll();
+            for (Review review : allReviews) {
+                boolean updated = false;
+
+                // Scoate utilizatorul din lista celor care au dat like
+                if (review.getLikedBy().contains(username)) {
+                    review.getLikedBy().remove(username);
+                    review.setLikes(review.getLikes() - 1);
+                    updated = true;
+                }
+
+                // Scoate utilizatorul din lista celor care au dat dislike
+                if (review.getDislikedBy().contains(username)) {
+                    review.getDislikedBy().remove(username);
+                    review.setDislikes(review.getDislikes() - 1);
+                    updated = true;
+                }
+
+                // Dacă recenzia a fost modificată, salvează actualizările
+                if (updated) {
+                    reviewRepository.save(review);
+                }
+            }
+
+            // Șterge utilizatorul
+            userRepository.delete(user);
 
             return "redirect:/login?accountDeleted";  // Redirecționează la login
         }
-        return "redirect:/profile";
-    }
-
-    @PostMapping("/profile/addFriend")
-    public String addFriend(@RequestParam Long friendId, Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-            User friend = userRepository.findById(friendId)
-                    .orElseThrow(() -> new UsernameNotFoundException("Friend not found"));
-
-            user.getFriends().add(friend);
-            userRepository.save(user);
-
-            return "redirect:/profile";
-        }
         return "redirect:/login";
     }
+
+
+
 }

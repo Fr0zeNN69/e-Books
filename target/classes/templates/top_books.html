@@ -44,7 +44,7 @@
           <span th:text="'(' + ${T(java.lang.String).format('%.1f', book.averageRating)} + ' / 5)'"></span>
         </div>
 
-        <a th:href="@{/reviews/view(bookId=${book.id})}" class="details-link">View Details</a>
+        <a th:href="@{/reviews/view(bookId=${book.id})}" class="details-link">View Reviews</a>
       </li>
     </ul>
   </div>

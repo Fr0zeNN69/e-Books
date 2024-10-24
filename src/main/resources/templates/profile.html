@@ -5,29 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${user.name} + ' Profile'">Profile</title>
     <link href="/css/profile.css" rel="stylesheet">
-
-    <script>
-        // Funcție pentru a ascunde/afișa secțiunile
-        function toggleSection(sectionId, buttonId) {
-            const section = document.getElementById(sectionId);
-            const button = document.getElementById(buttonId);
-            if (section.style.display === "none") {
-                section.style.display = "block";
-                button.textContent = "Hide " + button.dataset.section;
-            } else {
-                section.style.display = "none";
-                button.textContent = "Show " + button.dataset.section;
-            }
-        }
-
-        // Funcție pentru a edita bio-ul
-        function editBio() {
-            const bioSection = document.getElementById('bioSection');
-            const bioForm = document.getElementById('bioForm');
-            bioSection.style.display = 'none';
-            bioForm.style.display = 'block';
-        }
-    </script>
+    <script src="/js/profile.js"></script>
 </head>
 <body>
 
@@ -37,6 +15,9 @@
 <div class="settings-container">
     <!-- Afișăm numele utilizatorului și bio-ul -->
     <h2 th:text="${user.name} + ' Profile'"></h2>
+
+    <!-- Data înregistrării utilizatorului -->
+    <p><strong>Member since:</strong> <span th:text="${user.registrationDate.format(T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd'))}"></span></p>
 
     <!-- Bio-ul utilizatorului -->
     <div id="bioSection" th:if="${user.bio != null && !user.bio.isEmpty()}">
@@ -56,7 +37,9 @@
     <div id="bioForm" style="display: none;">
         <form th:action="@{/profile/updateBio}" method="post">
             <div class="form-group">
-                <textarea id="bio" name="bio" rows="4" placeholder="Enter your bio here" required></textarea>
+                <!-- Pre-populăm caseta de text cu bio-ul curent al utilizatorului -->
+                <textarea id="bio" name="bio" rows="4" placeholder="Enter your bio here" required
+                          th:text="${user.bio}"></textarea>
             </div>
             <div>
                 <button type="submit" class="btn book-btn">Save Bio</button>
@@ -64,14 +47,14 @@
         </form>
     </div>
 
-
+    <br>
     <h2>Activity</h2>
 
     <!-- Button to toggle review visibility -->
     <button id="toggleReviews" data-section="Reviews" class="btn book-btn" onclick="toggleSection('reviewsSection', 'toggleReviews')">Show Reviews</button>
 
     <!-- Reviews Section -->
-    <div id="reviewsSection" style="display: none;">
+    <div id="reviewsSection" class="settings-section-content" style="display: none;">
         <h3>Your Reviews</h3>
         <ul th:if="${!#lists.isEmpty(userReviews)}" th:each="review : ${userReviews}">
             <li>
@@ -90,7 +73,7 @@
     <button id="toggleFavorites" data-section="Favorite Books" class="btn book-btn" onclick="toggleSection('favoritesSection', 'toggleFavorites')">Show Favorite Books</button>
 
     <!-- Favorite Books Section -->
-    <div id="favoritesSection" style="display: none;">
+    <div id="favoritesSection" class="settings-section-content" style="display: none;">
         <h3>Favorite Books</h3>
         <ul th:if="${!#lists.isEmpty(favoriteBooks)}" th:each="book : ${favoriteBooks}">
             <li>
@@ -102,7 +85,35 @@
         <p th:if="${#lists.isEmpty(favoriteBooks)}">This user has no favorite books.</p>
     </div>
 
+    <!-- Schimbare Parolă -->
+    <div class="settings-section" th:if="${isCurrentUser}">
+        <br>
+        <h2>Change Password</h2>
+        <form th:action="@{/profile/changePassword}" method="post">
+            <div class="form-group">
+                <label for="oldPassword">Old Password:</label>
+                <input type="password" id="oldPassword" name="oldPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit" class="btn book-btn">Change Password</button>
+        </form>
+    </div>
 
+    <!-- Ștergere cont -->
+    <div class="settings-section" th:if="${isCurrentUser}">
+        <h2>Delete Account</h2>
+        <!-- Adăugăm evenimentul `onclick` pe butonul de ștergere -->
+        <form th:action="@{/profile/deleteAccount}" method="post">
+            <button type="submit" class="btn book-btn delete-btn" onclick="confirmDeleteAccount(event)">Delete Account</button>
+        </form>
+    </div>
 
 </div>
 

@@ -180,6 +180,42 @@ public class BookController {
         return "top_books";
     }
 
+    @GetMapping("/hottestTopics")
+    public String getHottestTopics(Model model, Authentication authentication) {
+        // Preluăm toate cărțile din baza de date
+        List<Book> books = bookRepository.findAll();
+
+        // Sortează cărțile în funcție de numărul de recenzii (descrescător)
+        books.sort(Comparator.comparingInt(book -> {
+            Book realBook = (Book) book;
+            if (realBook.getReviews() != null) {
+                return realBook.getReviews().size();
+            }
+            return 0;
+        }).reversed());
+
+
+        // Adaugă lista de cărți sortată în model
+        model.addAttribute("books", books);
+
+        // Obține lista de bookIds din favorite pentru utilizatorul autentificat
+        Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
+        model.addAttribute("favoriteBookIds", favoriteBookIds);
+
+        // Adaugă numele utilizatorului autentificat
+        if (authentication != null && authentication.isAuthenticated()) {
+            String currentUsername = authentication.getName();
+            model.addAttribute("currentUsername", currentUsername);
+        } else {
+            model.addAttribute("currentUsername", "Guest");
+        }
+
+        return "hottest_topics";
+    }
+
+
+
+
 
     /**
      * Metodă auxiliară pentru parsarea unui obiect Book din JsonNode.
