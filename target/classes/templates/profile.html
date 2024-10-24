@@ -13,47 +13,55 @@
 <div th:replace="navbar.html"></div>
 
 <div class="settings-container">
-    <!-- Afișăm numele utilizatorului și bio-ul -->
-    <h2 th:text="${user.name} + ' Profile'"></h2>
+    <!-- Profile Section with Profile Picture -->
+    <div class="profile-header">
+        <div class="profile-header-left">
+            <h2 th:text="${user.name} + ' Profile'"></h2>
+        </div>
 
-    <!-- Data înregistrării utilizatorului -->
-    <p><strong>Member since:</strong> <span th:text="${user.registrationDate.format(T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd'))}"></span></p>
+        <div class="profile-picture-container">
+            <!-- Doar utilizatorul conectat poate schimba poza -->
+            <form th:if="${isCurrentUser}" th:action="@{/profile/uploadProfilePicture}" method="post" enctype="multipart/form-data">
+                <label for="profilePictureInput">
+                    <img id="profileImage" th:src="${user.profileImageUrl ?: '/img/default-profile.png'}" alt="Profile Image" class="profile-picture-circle">
+                    <input id="profilePictureInput" type="file" name="file" style="display:none" onchange="this.form.submit()">
+                </label>
+            </form>
 
-    <!-- Bio-ul utilizatorului -->
+            <!-- Dacă utilizatorul nu este conectat, doar afișează poza -->
+            <div th:if="${!isCurrentUser}">
+                <img th:src="${user.profileImageUrl != null ? user.profileImageUrl : '/img/default-profile.png'}"
+                     alt="Profile Image" class="profile-picture-circle">
+            </div>
+        </div>
+    </div>
+    <!-- Member Info -->
+    <p ><strong>Member since:</strong> <span th:text="${user.registrationDate.format(T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd'))}"></span></p>
+    <!-- Bio Section -->
     <div id="bioSection" th:if="${user.bio != null && !user.bio.isEmpty()}">
         <p th:text="${user.bio}"></p>
-        <!-- Buton de editare doar dacă utilizatorul vizualizat este cel conectat -->
+        <!-- Only the logged-in user can edit their bio -->
         <button th:if="${isCurrentUser}" class="btn book-btn" onclick="editBio()">Edit Bio</button>
     </div>
-
-    <!-- Mesaj și buton dacă bio-ul este gol -->
     <div id="bioSection" th:if="${user.bio == null || user.bio.isEmpty()}">
         <p>Bio-ul este gol.</p>
-        <!-- Buton de adăugare doar dacă utilizatorul vizualizat este cel conectat -->
         <button th:if="${isCurrentUser}" class="btn book-btn" onclick="editBio()">Add Bio</button>
     </div>
 
-    <!-- Formularul de editare bio -->
+    <!-- Bio Form -->
     <div id="bioForm" style="display: none;">
         <form th:action="@{/profile/updateBio}" method="post">
             <div class="form-group">
-                <!-- Pre-populăm caseta de text cu bio-ul curent al utilizatorului -->
-                <textarea id="bio" name="bio" rows="4" placeholder="Enter your bio here" required
-                          th:text="${user.bio}"></textarea>
+                <textarea id="bio" name="bio" rows="4" placeholder="Enter your bio here" required th:text="${user.bio}"></textarea>
             </div>
-            <div>
-                <button type="submit" class="btn book-btn">Save Bio</button>
-            </div>
+            <button type="submit" class="btn book-btn">Save Bio</button>
         </form>
     </div>
 
     <br>
     <h2>Activity</h2>
-
-    <!-- Button to toggle review visibility -->
+    <!-- Activity sections like Reviews and Favorites -->
     <button id="toggleReviews" data-section="Reviews" class="btn book-btn" onclick="toggleSection('reviewsSection', 'toggleReviews')">Show Reviews</button>
-
-    <!-- Reviews Section -->
     <div id="reviewsSection" class="settings-section-content" style="display: none;">
         <h3>Your Reviews</h3>
         <ul th:if="${!#lists.isEmpty(userReviews)}" th:each="review : ${userReviews}">
@@ -62,32 +70,28 @@
                 <p><strong>Rating:</strong> <span th:text="${review.rating}"></span></p>
                 <p><strong>Review:</strong> <span th:text="${review.reviewText}"></span></p>
                 <p><strong>Date:</strong> <span th:text="${review.reviewDate}"></span></p>
-                <!-- Buton stilizat pentru a merge la pagina cărții -->
                 <a th:href="@{/reviews/view(bookId=${review.book.id})}" class="btn book-btn">View Book</a>
             </li>
         </ul>
         <p th:if="${#lists.isEmpty(userReviews)}">This user has not written any reviews yet.</p>
     </div>
 
-    <!-- Button to toggle favorite books visibility -->
-    <button id="toggleFavorites" data-section="Favorite Books" class="btn book-btn" onclick="toggleSection('favoritesSection', 'toggleFavorites')">Show Favorite Books</button>
-
     <!-- Favorite Books Section -->
+    <button id="toggleFavorites" data-section="Favorite Books" class="btn book-btn" onclick="toggleSection('favoritesSection', 'toggleFavorites')">Show Favorite Books</button>
     <div id="favoritesSection" class="settings-section-content" style="display: none;">
         <h3>Favorite Books</h3>
         <ul th:if="${!#lists.isEmpty(favoriteBooks)}" th:each="book : ${favoriteBooks}">
             <li>
                 <p><strong>Title:</strong> <span th:text="${book.title}"></span></p>
-                <!-- Buton stilizat pentru a merge la pagina cărții -->
                 <a th:href="@{/reviews/view(bookId=${book.id})}" class="btn book-btn">View Book</a>
             </li>
         </ul>
         <p th:if="${#lists.isEmpty(favoriteBooks)}">This user has no favorite books.</p>
     </div>
 
-    <!-- Schimbare Parolă -->
-    <div class="settings-section" th:if="${isCurrentUser}">
-        <br>
+    <!-- Change Password and Delete Account, only for current user -->
+    <div th:if="${isCurrentUser}">
+
         <h2>Change Password</h2>
         <form th:action="@{/profile/changePassword}" method="post">
             <div class="form-group">
@@ -104,12 +108,8 @@
             </div>
             <button type="submit" class="btn book-btn">Change Password</button>
         </form>
-    </div>
 
-    <!-- Ștergere cont -->
-    <div class="settings-section" th:if="${isCurrentUser}">
         <h2>Delete Account</h2>
-        <!-- Adăugăm evenimentul `onclick` pe butonul de ștergere -->
         <form th:action="@{/profile/deleteAccount}" method="post">
             <button type="submit" class="btn book-btn delete-btn" onclick="confirmDeleteAccount(event)">Delete Account</button>
         </form>

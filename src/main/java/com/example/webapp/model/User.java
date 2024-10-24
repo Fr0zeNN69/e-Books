@@ -32,6 +32,8 @@ public class User {
 
     private String role;  // Rol utilizator, ex: Admin, VIP, etc.
 
+    private String profileImageUrl;
+
     @ManyToMany
     @JoinTable(
             name = "user_books",
@@ -152,5 +154,13 @@ public class User {
 
     public void setFriends(Set<User> friends) {
         this.friends = friends;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

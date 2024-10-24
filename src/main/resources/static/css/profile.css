@@ -126,3 +126,46 @@ form {
 .delete-btn:hover {
     background-color: #c0392b;
 }
+
+/* Poziționează imaginea de profil în dreapta sus */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ecf0f1;
+
+
+    padding-bottom: 30px; /* Adaugă spațiu între text și linie */
+}
+
+.profile-header-left {
+    flex-grow: 1;
+}
+
+.profile-picture-container {
+    position: absolute;
+    top: -25px;
+    right: 0;
+    width: 100px;
+    height: 100px;
+}
+
+.profile-picture-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    cursor: pointer;
+}
+
+.profile-picture-circle:hover {
+    border-color: #2980b9;
+}
+/* Elimină linia de sub titlu */
+.profile-header h2 {
+    border-bottom: none;
+    margin-bottom: 0;
+}

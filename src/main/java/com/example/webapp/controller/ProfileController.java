@@ -5,6 +5,7 @@ import com.example.webapp.model.User;
 import com.example.webapp.repository.UserRepository;
 import com.example.webapp.model.Review;
 import com.example.webapp.repository.ReviewRepository;
+import com.example.webapp.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -30,6 +32,9 @@ public class ProfileController {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private S3Service s3Service;
 
     // Afișarea profilului pentru un utilizator specific
     @GetMapping("/profile/{username}")
@@ -113,6 +118,40 @@ public class ProfileController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @PostMapping("/profile/uploadProfilePicture")
+    public String uploadProfilePicture(@RequestParam("file") MultipartFile file, Authentication authentication, Model model) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            try {
+                // Ștergem imaginea de profil veche dacă există
+                String oldProfileImageUrl = user.getProfileImageUrl();
+                if (oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()) {
+                    s3Service.deleteFile(oldProfileImageUrl);
+                }
+
+                // Salvăm fișierul nou în S3 și obținem URL-ul
+                String profileImageUrl = s3Service.uploadFile(file.getInputStream(), file.getOriginalFilename());
+
+                // Actualizăm utilizatorul cu URL-ul noii poze de profil
+                user.setProfileImageUrl(profileImageUrl);
+                userRepository.save(user);
+
+                model.addAttribute("success", "Profile picture updated successfully.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                model.addAttribute("error", "There was an error uploading your profile picture.");
+            }
+
+            return "redirect:/profile/" + username;
+        }
+        return "redirect:/login";
+    }
+
+
+
 
     @PostMapping("/profile/deleteAccount")
     public String deleteAccount(Authentication authentication) {
@@ -161,3 +200,13 @@ public class ProfileController {
 
 
 }
+
+
+
+
+
+
+
+
+
+

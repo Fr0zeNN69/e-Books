@@ -71,17 +71,43 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- AWS SDK for S3 -->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.20.64</version> <!-- sau o altă versiune stabilă -->
+		</dependency>
+
+		<!-- Spring Cloud AWS -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-aws</artifactId>
+			<version>2.2.6.RELEASE</version> <!-- versiune stabilă pentru Spring Cloud AWS -->
+		</dependency>
+
 		<!-- Spring Security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<repositories>
 		<repository>
-			<id>central</id>
-			<url>https://repo.maven.apache.org/maven2</url>
+			<id>spring-releases</id>
+			<url>https://repo.spring.io/release</url>
+		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+		<repository>
+			<id>spring-snapshots</id>
+			<url>https://repo.spring.io/snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
