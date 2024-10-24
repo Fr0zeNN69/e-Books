@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/reviews")
@@ -22,11 +22,9 @@ public class ReviewController {
     private ReviewRepository reviewRepository;
 
     @Autowired
-    private BookRepository bookRepository;  // Injectează repository-ul pentru Book
+    private BookRepository bookRepository;
 
-    /**
-     * Adaugă o nouă recenzie
-     */
+    // Adăugare recenzie
     @PostMapping("/add")
     public String addReview(@RequestParam("bookId") String bookId,
                             @RequestParam("reviewText") String reviewText,
@@ -35,66 +33,129 @@ public class ReviewController {
                             RedirectAttributes redirectAttributes) {
         String username = authentication.getName();
 
-        // Validare rating
         if (rating < 1 || rating > 5) {
             redirectAttributes.addFlashAttribute("error", "Ratingul trebuie să fie între 1 și 5 stele.");
             return "redirect:/reviews/view?bookId=" + bookId;
         }
 
-        // Găsește cartea pe baza ID-ului
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + bookId));
 
-        // Previne adăugarea mai multor recenzii pentru aceeași carte de către același utilizator
         List<Review> existingReviews = reviewRepository.findByBookIdAndUsername(bookId, username);
         if (!existingReviews.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Ai deja o recenzie pentru această carte.");
             return "redirect:/reviews/view?bookId=" + bookId;
         }
 
-        // Creează recenzia
         Review review = new Review();
-        review.setBook(book);  // Asociază recenzia cu cartea
+        review.setBook(book);
         review.setReviewText(reviewText);
         review.setRating(rating);
         review.setUsername(username);
         review.setReviewDate(LocalDate.now());
 
-        // Salvează recenzia în baza de date
         reviewRepository.save(review);
 
         redirectAttributes.addFlashAttribute("success", "Recenzia a fost adăugată cu succes.");
         return "redirect:/reviews/view?bookId=" + bookId;
     }
 
-    /**
-     * Vizualizează recenziile pentru o anumită carte
-     */
+    // Vizualizarea recenziilor cu sortare
     @GetMapping("/view")
     public String viewReviews(@RequestParam("bookId") String bookId,
+                              @RequestParam(value = "sort", defaultValue = "recent") String sort,
                               Authentication authentication,
                               Model model) {
         String username = authentication.getName();
         model.addAttribute("username", username);
 
-        // Găsește cartea pe baza ID-ului
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + bookId));
 
-        // Găsește recenziile asociate cărții
         List<Review> reviews = reviewRepository.findByBookId(bookId);
 
-        // Calculează ratingul mediu
+        // Sortarea recenziilor în funcție de criteriul selectat
+        switch (sort) {
+            case "stars":
+                reviews.sort(Comparator.comparingInt(Review::getRating).reversed());
+                break;
+            case "likes":
+                reviews.sort(Comparator.comparingInt(Review::getLikes).reversed());
+                break;
+            case "recent":
+            default:
+                reviews.sort(Comparator.comparing(Review::getReviewDate).reversed());
+                break;
+        }
+
         double averageRating = 0.0;
         if (!reviews.isEmpty()) {
             averageRating = reviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
         }
 
-        // Adaugă informațiile necesare în model
         model.addAttribute("reviews", reviews);
         model.addAttribute("book", book);
         model.addAttribute("averageRating", averageRating);
+        model.addAttribute("sort", sort);  // Trimitem criteriul de sortare către view
 
-        return "reviews";  // Afișează pagina reviews.html
+        return "reviews";
+    }
+
+    // Metodă pentru like
+    @PostMapping("/like/{reviewId}")
+    @ResponseBody
+    public Map<String, Object> likeReview(@PathVariable Long reviewId, Authentication authentication) {
+        String username = authentication.getName();
+        Map<String, Object> response = new HashMap<>();
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid review Id: " + reviewId));
+
+        // Verifică dacă utilizatorul a dat deja dislike și dorește să schimbe votul
+        if (review.getDislikedBy().contains(username)) {
+            review.setDislikes(review.getDislikes() - 1);  // Scade numărul de dislike-uri
+            review.getDislikedBy().remove(username);       // Scoate utilizatorul din setul de dislikes
+        }
+
+        if (review.getLikedBy().contains(username)) {
+            response.put("error", "Ai dat deja like.");
+        } else {
+            review.setLikes(review.getLikes() + 1);       // Crește numărul de like-uri
+            review.getLikedBy().add(username);            // Adaugă utilizatorul în setul de likes
+            reviewRepository.save(review);
+        }
+
+        response.put("likes", review.getLikes());
+        response.put("dislikes", review.getDislikes());
+        return response;
+    }
+
+    // Metodă pentru dislike
+    @PostMapping("/dislike/{reviewId}")
+    @ResponseBody
+    public Map<String, Object> dislikeReview(@PathVariable Long reviewId, Authentication authentication) {
+        String username = authentication.getName();
+        Map<String, Object> response = new HashMap<>();
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid review Id: " + reviewId));
+
+        // Verifică dacă utilizatorul a dat deja like și dorește să schimbe votul
+        if (review.getLikedBy().contains(username)) {
+            review.setLikes(review.getLikes() - 1);  // Scade numărul de like-uri
+            review.getLikedBy().remove(username);    // Scoate utilizatorul din setul de likes
+        }
+
+        if (review.getDislikedBy().contains(username)) {
+            response.put("error", "Ai dat deja dislike.");
+        } else {
+            review.setDislikes(review.getDislikes() + 1);  // Crește numărul de dislike-uri
+            review.getDislikedBy().add(username);          // Adaugă utilizatorul în setul de dislikes
+            reviewRepository.save(review);
+        }
+
+        response.put("likes", review.getLikes());
+        response.put("dislikes", review.getDislikes());
+        return response;
     }
 }

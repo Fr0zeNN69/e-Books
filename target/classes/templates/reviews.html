@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Reviews for <span th:text="${book.title}"></span></title>
   <link href="/css/review.css" rel="stylesheet">
+  <meta name="_csrf" content="[[${_csrf.token}]]"/>
+  <meta name="_csrf_header" content="[[${_csrf.headerName}]]"/>
   <!-- Include Font Awesome for icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -13,7 +15,7 @@
 <div th:replace="navbar.html"></div>
 
 <div class="settings-container">
-  <h1>Reviews for <span th:text="${book.title}"></span></h1>
+  <h1><span th:text="${book.title}"></span></h1>
 
   <!-- Display average rating -->
   <div class="average-rating">
@@ -36,22 +38,46 @@
   <div class="book-info">
     <p><strong>Title:</strong> <span th:text="${book.title}">Title</span></p>
     <p><strong>Authors:</strong> <span th:text="${book.authors}">Authors</span></p>
-    <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
     <p><strong>Categories:</strong> <span th:text="${book.categories}">Categories</span></p>
+    <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
   </div>
+
+  <hr>
+  <h2>Reviews:</h2> <!-- Am adăugat acest element -->
+
+  <!-- Sortare recenzii -->
+  <form action="" method="get" class="sort-form">
+    <input type="hidden" name="bookId" th:value="${book.id}">
+    <label for="sort">Sort by:</label>
+    <select name="sort" id="sort" onchange="this.form.submit()">
+      <option value="recent" th:selected="${sort == 'recent'}">Most Recent</option>
+      <option value="stars" th:selected="${sort == 'stars'}">Stars (High to Low)</option>
+      <option value="likes" th:selected="${sort == 'likes'}">Most Popular (Likes)</option>
+    </select>
+  </form>
 
   <!-- Display Reviews -->
   <div th:each="review : ${reviews}">
     <div class="review">
       <h3 th:text="${review.username}"></h3>
       <div class="rating">
-                <span th:each="i : ${#numbers.sequence(1, 5)}">
-                    <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
-                </span>
+        <span th:each="i : ${#numbers.sequence(1, 5)}">
+          <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+        </span>
         <span th:text="'(' + ${review.rating} + ' / 5)'"></span>
       </div>
       <p th:text="${review.reviewText}"></p>
       <p>Review Date: <span th:text="${review.reviewDate}"></span></p>
+
+      <!-- Like/Dislike buttons -->
+      <div class="review-votes">
+        <button class="vote-btn like-btn" th:data-review-id="${review.id}">
+          <i class="fas fa-thumbs-up"></i> <span th:text="${review.likes}">0</span>
+        </button>
+        <button class="vote-btn dislike-btn" th:data-review-id="${review.id}">
+          <i class="fas fa-thumbs-down"></i> <span th:text="${review.dislikes}">0</span>
+        </button>
+      </div>
     </div>
     <hr>
   </div>
@@ -93,5 +119,6 @@
 
 </div>
 
+<script src="/js/review.js"></script>
 </body>
 </html>

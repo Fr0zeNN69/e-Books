@@ -2,6 +2,8 @@ package com.example.webapp.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Review {
@@ -10,7 +12,6 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relația ManyToOne cu Book
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
@@ -24,13 +25,24 @@ public class Review {
 
     private LocalDate reviewDate;
 
-    // Getters and Setters
+    private int likes = 0;
+    private int dislikes = 0;
+
+    @ElementCollection
+    private Set<String> likedBy = new HashSet<>();
+
+    @ElementCollection
+    private Set<String> dislikedBy = new HashSet<>();
+
+    // Getters și setters
 
     public Long getId() {
         return id;
     }
 
-    // ... alte getters și setters
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Book getBook() {
         return book;
@@ -70,5 +82,37 @@ public class Review {
 
     public void setReviewDate(LocalDate reviewDate) {
         this.reviewDate = reviewDate;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(int dislikes) {
+        this.dislikes = dislikes;
+    }
+
+    public Set<String> getLikedBy() {
+        return likedBy;
+    }
+
+    public void setLikedBy(Set<String> likedBy) {
+        this.likedBy = likedBy;
+    }
+
+    public Set<String> getDislikedBy() {
+        return dislikedBy;
+    }
+
+    public void setDislikedBy(Set<String> dislikedBy) {
+        this.dislikedBy = dislikedBy;
     }
 }
