@@ -23,14 +23,8 @@ public class User {
 
     private String profilePictureUrl; // URL imagine profil
 
-    @ElementCollection
-    private Set<String> socialLinks = new HashSet<>(); // Link-uri sociale
-
-    private String location;  // Locație utilizator
 
     private LocalDate registrationDate;  // Data înregistrării utilizatorului
-
-    private String role;  // Rol utilizator, ex: Admin, VIP, etc.
 
     private String profileImageUrl;
 
@@ -42,13 +36,7 @@ public class User {
     )
     private Set<Book> favoriteBooks = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_friends",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "friend_id")
-    )
-    private Set<User> friends = new HashSet<>();  // Lista de prieteni
+
 
     // Constructor, Getters și Setters
     @PrePersist
@@ -72,13 +60,6 @@ public class User {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getUsername() {
         return username;
@@ -104,41 +85,14 @@ public class User {
         this.bio = bio;
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
-
-    public Set<String> getSocialLinks() {
-        return socialLinks;
-    }
-
-    public void setSocialLinks(Set<String> socialLinks) {
-        this.socialLinks = socialLinks;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public LocalDate getRegistrationDate() {
         return registrationDate;
     }
 
-    public String getRole() {
-        return role;
+    public void setRegistrationDate(LocalDate registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     public Set<Book> getFavoriteBooks() {
         return favoriteBooks;
@@ -148,13 +102,7 @@ public class User {
         this.favoriteBooks = favoriteBooks;
     }
 
-    public Set<User> getFriends() {
-        return friends;
-    }
 
-    public void setFriends(Set<User> friends) {
-        this.friends = friends;
-    }
 
     public String getProfileImageUrl() {
         return profileImageUrl;

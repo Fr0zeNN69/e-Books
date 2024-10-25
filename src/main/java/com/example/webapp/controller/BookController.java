@@ -270,21 +270,6 @@ public class BookController {
         return book;
     }
 
-    /**
-     * Metodă auxiliară pentru verificarea dacă un Book conține genul dorit.
-     */
-    private boolean containsDesiredGenre(Book book, String genre) {
-        if (book.getCategories() == null || book.getCategories().isEmpty()) {
-            return false;
-        }
-        String[] genres = book.getCategories().split(",\\s*");
-        for (String g : genres) {
-            if (g.equalsIgnoreCase(genre)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Metodă auxiliară pentru obținerea setului de bookIds favorite ale utilizatorului.
