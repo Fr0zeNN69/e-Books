@@ -17,14 +17,13 @@ public class User {
     private String username;
     private String password;
 
-    // Adăugăm câmpurile noi
     @Lob
     private String bio;  // Biografia utilizatorului
 
-    private String profilePictureUrl; // URL imagine profil
+    private String profilePictureUrl;
 
 
-    private LocalDate registrationDate;  // Data înregistrării utilizatorului
+    private LocalDate registrationDate;
 
     private String profileImageUrl;
 
@@ -37,8 +36,6 @@ public class User {
     private Set<Book> favoriteBooks = new HashSet<>();
 
 
-
-    // Constructor, Getters și Setters
     @PrePersist
     protected void onCreate() {
         this.registrationDate = LocalDate.now();

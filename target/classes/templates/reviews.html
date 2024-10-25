@@ -6,18 +6,15 @@
   <link href="/css/review.css" rel="stylesheet">
   <meta name="_csrf" content="[[${_csrf.token}]]"/>
   <meta name="_csrf_header" content="[[${_csrf.headerName}]]"/>
-  <!-- Include Font Awesome for icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- Include navbar -->
 <div th:replace="navbar.html"></div>
 
 <div class="settings-container">
   <h1><span th:text="${book.title}"></span></h1>
 
-  <!-- Display average rating -->
   <div class="average-rating">
     <strong>Average Rating:</strong>
     <span th:text="${T(java.lang.String).format('%.1f', averageRating)}">0.0</span> / 5
@@ -26,7 +23,6 @@
         </span>
   </div>
 
-  <!-- Display error or success messages -->
   <div th:if="${error}" class="alert error">
     <p th:text="${error}"></p>
   </div>
@@ -34,7 +30,6 @@
     <p th:text="${success}"></p>
   </div>
 
-  <!-- Display Book Details -->
   <div class="book-info">
     <p><strong>Title:</strong> <span th:text="${book.title}">Title</span></p>
     <p><strong>Authors:</strong> <span th:text="${book.authors}">Authors</span></p>
@@ -43,9 +38,8 @@
   </div>
 
   <hr>
-  <h2>Reviews:</h2> <!-- Am adăugat acest element -->
+  <h2>Reviews:</h2>
 
-  <!-- Sortare recenzii -->
   <form action="" method="get" class="sort-form">
     <input type="hidden" name="bookId" th:value="${book.id}">
     <label for="sort">Sort by:</label>
@@ -56,10 +50,8 @@
     </select>
   </form>
 
-  <!-- Display Reviews -->
   <div th:each="review : ${reviews}">
     <div class="review">
-      <!-- Link către profilul utilizatorului -->
       <h3>
         <a th:href="@{/profile/{username}(username=${review.username})}" th:text="${review.username}"></a>
       </h3>
@@ -72,7 +64,6 @@
       <p th:text="${review.reviewText}"></p>
       <p>Review Date: <span th:text="${review.reviewDate}"></span></p>
 
-      <!-- Like/Dislike buttons -->
       <div class="review-votes">
         <button class="vote-btn like-btn" th:data-review-id="${review.id}">
           <i class="fas fa-thumbs-up"></i> <span th:text="${review.likes}">0</span>
@@ -85,8 +76,6 @@
     <hr>
   </div>
 
-
-  <!-- Add a Review Form -->
   <h2>Add a Review:</h2>
   <form th:action="@{/reviews/add}" method="post">
     <input type="hidden" name="bookId" th:value="${book.id}">

@@ -33,7 +33,7 @@ public class UserController {
     @PostMapping("/add")
     @ResponseBody
     public User addUser(@RequestBody User user) {
-        // Criptează parola înainte de a salva utilizatorul
+        // Cripteaza parola inainte de a salva utilizatorul
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -44,10 +44,10 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    // Metodă pentru înregistrarea utilizatorilor
+    // Metoda pentru inregistrarea utilizatorilor
     @GetMapping("/register")
     public String showRegisterForm() {
-        return "register"; // Afișează pagina HTML register.html
+        return "register"; // Afiseaza pagina HTML register.html
     }
 
     @PostMapping("/register")
@@ -56,17 +56,17 @@ public class UserController {
             return "register";
         }
 
-        // Verificare în log dacă metoda este apelată corect
+        // Verificare in log daca metoda este apelata corect
         System.out.println("Utilizatorul se înregistrează: " + user.getUsername());
 
-        // Criptează parola înainte de a salva
+        // Cripteaza parola inainte de a salva
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
         return "redirect:/login";
     }
 
-    // Endpoint pentru adăugarea unei cărți la favorite
+    // Endpoint pentru adaugarea unei carti la favorite
     @PostMapping("/favorites/add")
     @ResponseBody
     public ResponseEntity<String> addFavorite(@RequestParam("bookId") String bookId, Authentication authentication) {
@@ -77,11 +77,11 @@ public class UserController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Utilizator invalid"));
 
-        // Obține cartea
+        // Obtine cartea
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("ID carte invalid: " + bookId));
 
-        // Adaugă la favorite dacă nu există deja
+        // Adauga la favorite daca nu exista deja
         if (!user.getFavoriteBooks().contains(book)) {
             user.getFavoriteBooks().add(book);
             userRepository.save(user);
@@ -90,7 +90,7 @@ public class UserController {
         return new ResponseEntity<>("Cartea a fost adăugată la favorite", HttpStatus.OK);
     }
 
-    // Endpoint pentru eliminarea unei cărți din favorite
+    // Endpoint pentru eliminarea unei carti din favorite
     @PostMapping("/favorites/remove")
     @ResponseBody
     public ResponseEntity<String> removeFavorite(@RequestParam("bookId") String bookId, Authentication authentication) {
@@ -101,16 +101,31 @@ public class UserController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Utilizator invalid"));
 
-        // Obține cartea
+        // Obtine cartea
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("ID carte invalid: " + bookId));
 
-        // Elimină din favorite dacă există
+        // Elimina din favorite dacă exista
         if (user.getFavoriteBooks().contains(book)) {
             user.getFavoriteBooks().remove(book);
             userRepository.save(user);
         }
 
         return new ResponseEntity<>("Cartea a fost eliminată din favorite", HttpStatus.OK);
+    }
+    @GetMapping("/search")
+    public String searchUsers(@RequestParam("username") String username, Model model, Authentication authentication) {
+        // Seteaza numele utilizatorului curent în model
+        if (authentication != null && authentication.isAuthenticated()) {
+            String currentUsername = authentication.getName();
+            model.addAttribute("currentUsername", currentUsername);
+        }
+
+        // Cauta utilizatori
+        List<User> users = userRepository.findByUsernameContainingIgnoreCase(username);
+        model.addAttribute("users", users);
+        model.addAttribute("query", username);
+
+        return "user_search_results"; // pagina pentru afisarea rezultatelor cautarii
     }
 }

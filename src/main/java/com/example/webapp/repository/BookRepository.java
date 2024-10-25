@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
-    // Metoda personalizată pentru a căuta cărți după titlu
     List<Book> findByTitleContainingIgnoreCase(String title);
 }

@@ -8,19 +8,15 @@
 </head>
 <body>
 
-<!-- Include navbar -->
 <div th:replace="navbar.html"></div>
 
-<!-- Container principal pentru Hottest Topics -->
 <div class="container">
     <h2>Hottest Topics - Most Reviewed Books</h2>
 
-    <!-- Verifică dacă există cărți -->
     <div th:if="${#lists.isEmpty(books)}" class="no-results">
         <p>No books found.</p>
     </div>
 
-    <!-- Afișează lista de cărți -->
     <div th:unless="${#lists.isEmpty(books)}">
         <ul class="book-list">
             <li class="book-item" th:each="book : ${books}">
@@ -29,7 +25,6 @@
                 <p><strong>Number of Reviews:</strong> <span th:text="${book.reviews.size()}">0</span></p>
                 <p><strong>Category:</strong> <span th:text="${book.categories}">Category</span></p>
 
-                <!-- Afișăm un link pentru vizualizarea detaliilor -->
                 <a th:href="@{/reviews/view(bookId=${book.id})}" class="details-link">View Reviews</a>
             </li>
         </ul>

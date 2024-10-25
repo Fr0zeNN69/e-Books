@@ -62,7 +62,7 @@ class UserControllerTest {
         book.setId("1");
     }
 
-    // Test pentru înregistrarea unui utilizator nou
+    // Test for creating a new user
     @Test
     void testRegisterUser_Success() {
         when(passwordEncoder.encode("plaintextpassword")).thenReturn("encodedpassword");
@@ -84,7 +84,7 @@ class UserControllerTest {
         assertEquals("register", result);
     }
 
-    // Test pentru adăugarea unei cărți la favorite
+    // Test for adding a book at fav
     @Test
     void testAddFavorite_Success() {
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -125,7 +125,6 @@ class UserControllerTest {
         assertEquals("Cartea a fost adăugată la favorite", response.getBody());
     }
 
-    // Test pentru eliminarea unei cărți din favorite
     @Test
     void testRemoveFavorite_Success() {
         user.getFavoriteBooks().add(book);
@@ -155,7 +154,6 @@ class UserControllerTest {
         assertEquals("Cartea a fost eliminată din favorite", response.getBody());
     }
 
-    // Test pentru listarea tuturor utilizatorilor
     @Test
     void testGetAllUsers() {
         List<User> users = Arrays.asList(new User(), new User());
@@ -167,7 +165,6 @@ class UserControllerTest {
         verify(userRepository).findAll();
     }
 
-    // Test pentru adăugarea unui utilizator nou prin API
     @Test
     void testAddUser() {
         when(passwordEncoder.encode("plaintextpassword")).thenReturn("encodedpassword");

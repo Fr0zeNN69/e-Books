@@ -24,7 +24,7 @@ public class ReviewController {
     @Autowired
     private BookRepository bookRepository;
 
-    // Adăugare recenzie
+    // Adaugare recenzie
     @PostMapping("/add")
     public String addReview(@RequestParam("bookId") String bookId,
                             @RequestParam("reviewText") String reviewText,
@@ -66,7 +66,7 @@ public class ReviewController {
                               @RequestParam(value = "sort", defaultValue = "recent") String sort,
                               Authentication authentication,
                               Model model) {
-        // Obținem username-ul autentificat sau "Guest" dacă utilizatorul nu este autentificat
+        // Obtinem username ul autentificat sau "Guest" daca utilizatorul nu este autentificat
         String currentUsername = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : "Guest";
         model.addAttribute("currentUsername", currentUsername);
 
@@ -76,7 +76,7 @@ public class ReviewController {
 
         List<Review> reviews = reviewRepository.findByBookId(bookId);
 
-        // Sortarea recenziilor în funcție de criteriul selectat
+        // Sortarea recenziilor in functie de criteriul selectat
         switch (sort) {
             case "stars":
                 reviews.sort(Comparator.comparingInt(Review::getRating).reversed());
@@ -98,12 +98,12 @@ public class ReviewController {
         model.addAttribute("reviews", reviews);
         model.addAttribute("book", book);
         model.addAttribute("averageRating", averageRating);
-        model.addAttribute("sort", sort);  // Trimitem criteriul de sortare către view
+        model.addAttribute("sort", sort);  // Trimitem criteriul de sortare catre view
 
         return "reviews";
     }
 
-    // Metodă pentru like
+    // Metoda pentru like
     @PostMapping("/like/{reviewId}")
     @ResponseBody
     public Map<String, Object> likeReview(@PathVariable Long reviewId, Authentication authentication) {
@@ -113,17 +113,17 @@ public class ReviewController {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid review Id: " + reviewId));
 
-        // Verifică dacă utilizatorul a dat deja dislike și dorește să schimbe votul
+        // Verifica dacă utilizatorul a dat deja dislike si dorește sa schimbe votul
         if (review.getDislikedBy().contains(username)) {
-            review.setDislikes(review.getDislikes() - 1);  // Scade numărul de dislike-uri
+            review.setDislikes(review.getDislikes() - 1);  // Scade nr de dislike-uri
             review.getDislikedBy().remove(username);       // Scoate utilizatorul din setul de dislikes
         }
 
         if (review.getLikedBy().contains(username)) {
             response.put("error", "Ai dat deja like.");
         } else {
-            review.setLikes(review.getLikes() + 1);       // Crește numărul de like-uri
-            review.getLikedBy().add(username);            // Adaugă utilizatorul în setul de likes
+            review.setLikes(review.getLikes() + 1);       // Creste nr de like-uri
+            review.getLikedBy().add(username);            // Adauga utilizatorul in setul de likes
             reviewRepository.save(review);
         }
 
@@ -132,7 +132,7 @@ public class ReviewController {
         return response;
     }
 
-    // Metodă pentru dislike
+    // Metoda pentru dislike
     @PostMapping("/dislike/{reviewId}")
     @ResponseBody
     public Map<String, Object> dislikeReview(@PathVariable Long reviewId, Authentication authentication) {
@@ -142,17 +142,17 @@ public class ReviewController {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid review Id: " + reviewId));
 
-        // Verifică dacă utilizatorul a dat deja like și dorește să schimbe votul
+        // Verifica daca utilizatorul a dat deja like si dorește sa schimbe votul
         if (review.getLikedBy().contains(username)) {
-            review.setLikes(review.getLikes() - 1);  // Scade numărul de like-uri
+            review.setLikes(review.getLikes() - 1);  // Scade nr de like-uri
             review.getLikedBy().remove(username);    // Scoate utilizatorul din setul de likes
         }
 
         if (review.getDislikedBy().contains(username)) {
             response.put("error", "Ai dat deja dislike.");
         } else {
-            review.setDislikes(review.getDislikes() + 1);  // Crește numărul de dislike-uri
-            review.getDislikedBy().add(username);          // Adaugă utilizatorul în setul de dislikes
+            review.setDislikes(review.getDislikes() + 1);  // Creste nr de dislike-uri
+            review.getDislikedBy().add(username);          // Adauga utilizatorul in setul de dislikes
             reviewRepository.save(review);
         }
 

@@ -1,0 +1,23 @@
+
+.user-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-item {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.user-link {
+    text-decoration: none;
+    color: #2c3e50;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.user-link:hover {
+    color: #2c3e50;
+}

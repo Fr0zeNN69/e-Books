@@ -59,7 +59,7 @@ class ProfileControllerTest {
         mockUser = new User();
         mockUser.setUsername("testuser");
         mockUser.setBio("Old bio");
-        mockUser.setPassword("encodedOldPass"); // Parola este setată pentru testul de schimbare a parolei
+        mockUser.setPassword("encodedOldPass");
     }
 
     @Test
@@ -70,7 +70,7 @@ class ProfileControllerTest {
 
         String result = profileController.updateBio("New bio", authentication, model);
 
-        verify(userRepository).save(mockUser); // Verificăm că este salvat utilizatorul
+        verify(userRepository).save(mockUser);
         assertEquals("New bio", mockUser.getBio());
         assertEquals("redirect:/profile/testuser", result);
     }
@@ -111,9 +111,9 @@ class ProfileControllerTest {
 
         String result = profileController.changePassword("oldPass", "newPass", "newPass", authentication, model);
 
-        verify(userRepository).save(mockUser);  // Verificare că `save` este apelat
-        assertEquals("encodedNewPass", mockUser.getPassword());  // Verificare că parola a fost actualizată
-        assertEquals("redirect:/profile/testuser", result);  // Verificare redirecționare
+        verify(userRepository).save(mockUser);
+        assertEquals("encodedNewPass", mockUser.getPassword());
+        assertEquals("redirect:/profile/testuser", result);
     }
 
 

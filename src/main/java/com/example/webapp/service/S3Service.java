@@ -30,12 +30,12 @@ public class S3Service {
 
         // Construim S3Client folosind DefaultCredentialsProvider
         this.s3Client = S3Client.builder()
-                .region(Region.of(region))  // Setăm regiunea corectă pentru bucket-ul S3
-                .credentialsProvider(DefaultCredentialsProvider.create())  // Folosim credențialele din mediul înconjurător
+                .region(Region.of(region))  // Setez regiunea corecta pentru bucket-ul S3
+                .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
     }
 
-    // Metodă pentru a încărca un fișier nou
+    // pt incarcare fisier nou
     public String uploadFile(InputStream inputStream, String originalFileName) throws Exception {
         String key = UUID.randomUUID().toString() + "_" + originalFileName;
 
@@ -49,9 +49,9 @@ public class S3Service {
         return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key;
     }
 
-    // Metodă pentru a șterge fișierul vechi
+    // pt stergere fisier vechi
     public void deleteFile(String imageUrl) throws Exception {
-        String key = imageUrl.substring(imageUrl.lastIndexOf("/") + 1); // Extragem cheia fișierului din URL
+        String key = imageUrl.substring(imageUrl.lastIndexOf("/") + 1); // etragere fisier din url
 
         DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                 .bucket(bucketName)

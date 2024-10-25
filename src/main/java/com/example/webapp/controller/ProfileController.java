@@ -36,23 +36,23 @@ public class ProfileController {
     @Autowired
     private S3Service s3Service;
 
-    // Afișarea profilului pentru un utilizator specific
+    // Afisarea profilului pentru un utilizator specific
     @GetMapping("/profile/{username}")
     public String showProfile(@PathVariable String username, Model model, Authentication authentication) {
         User profileUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // Afișează numele utilizatorului conectat în navbar
+        // Afiseaza numele utilizatorului conectat in navbar
         if (authentication != null) {
             String currentUsername = authentication.getName();
             model.addAttribute("currentUsername", currentUsername); // Utilizatorul conectat
         }
 
-        // Afișează profilul utilizatorului vizualizat
+        // Afiseaza profilul utilizatorului vizualizat
         model.addAttribute("user", profileUser);
         model.addAttribute("isCurrentUser", authentication != null && profileUser.getUsername().equals(authentication.getName()));
 
-        // Adaugă restul datelor (recenzii, favorite, etc.)
+        // Adauga restul datelor (recenzii, favorite, etc.)
         List<Review> userReviews = reviewRepository.findByUsername(username);
         List<Book> favoriteBooks = new ArrayList<>(profileUser.getFavoriteBooks());
 
@@ -93,26 +93,26 @@ public class ProfileController {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            // Verifică dacă parola veche este corectă (folosind PasswordEncoder)
+            // Verifica daca parola veche este corecta (folosind PasswordEncoder)
             if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
                 model.addAttribute("error", "Old password is incorrect.");
                 return "redirect:/profile/" + username;
             }
 
-            // Verifică dacă noua parolă și confirmarea coincid
+            // Verifica daca noua parola si confirmarea coincid
             if (!newPassword.equals(confirmPassword)) {
                 model.addAttribute("error", "New passwords do not match.");
                 return "redirect:/profile/" + username;
             }
 
-            // Salvează noua parolă criptată
+            // Salveaza noua parola criptata
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
 
             model.addAttribute("success", "Password updated successfully.");
-            return "redirect:/profile/" + username;  // Redirecționează la profil după schimbarea parolei
+            return "redirect:/profile/" + username;  // Redirectioneaza la profil dupa schimbarea parolei
         }
-        return "redirect:/login";  // Redirecționează la login dacă utilizatorul nu este autentificat
+        return "redirect:/login";  // Redirectioneaza la login daca utilizatorul nu este autentificat
     }
 
     @Autowired
@@ -126,16 +126,16 @@ public class ProfileController {
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             try {
-                // Ștergem imaginea de profil veche dacă există
+                // stergem imaginea de profil veche daca exista
                 String oldProfileImageUrl = user.getProfileImageUrl();
                 if (oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()) {
                     s3Service.deleteFile(oldProfileImageUrl);
                 }
 
-                // Salvăm fișierul nou în S3 și obținem URL-ul
+                // Salvam fisierul nou în S3 si obtinem URL-ul
                 String profileImageUrl = s3Service.uploadFile(file.getInputStream(), file.getOriginalFilename());
 
-                // Actualizăm utilizatorul cu URL-ul noii poze de profil
+                // Actualizam utilizatorul cu URL-ul noii poze de profil
                 user.setProfileImageUrl(profileImageUrl);
                 userRepository.save(user);
 
@@ -160,11 +160,11 @@ public class ProfileController {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            // Șterge toate recenziile asociate cu utilizatorul
+            // sterge toate recenziile asociate cu utilizatorul
             List<Review> userReviews = reviewRepository.findByUsername(username);
             reviewRepository.deleteAll(userReviews);
 
-            // Actualizează recenziile like-uite/dislike-uite de utilizator
+            // Actualizeaza recenziile like-uite/dislike-uite de utilizator
             List<Review> allReviews = reviewRepository.findAll();
             for (Review review : allReviews) {
                 boolean updated = false;
@@ -183,16 +183,16 @@ public class ProfileController {
                     updated = true;
                 }
 
-                // Dacă recenzia a fost modificată, salvează actualizările
+                // Daca recenzia a fost modificata, salveaza actualizarile
                 if (updated) {
                     reviewRepository.save(review);
                 }
             }
 
-            // Șterge utilizatorul
+            // sterge utilizatorul
             userRepository.delete(user);
 
-            return "redirect:/login?accountDeleted";  // Redirecționează la login
+            return "redirect:/login?accountDeleted";  // Redirectioneaza la login
         }
         return "redirect:/login";
     }

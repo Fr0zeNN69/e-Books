@@ -34,7 +34,6 @@ public class Review {
     @ElementCollection
     private Set<String> dislikedBy = new HashSet<>();
 
-    // Getters și setters
 
     public Long getId() {
         return id;

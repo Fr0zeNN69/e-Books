@@ -10,13 +10,13 @@
 </head>
 <body>
 
-<!-- Include navbar -->
+
 <div th:replace="navbar.html"></div>
 
 <div class="container">
   <h2 class="section-title" th:text="${query != null && !query.isEmpty()} ? 'Results for: ' + ${query} : 'Book Search'">Search Results</h2>
 
-  <!-- Form pentru filtrare și sortare -->
+
   <form action="/search" method="get" class="filter-form">
     <div>
       <label for="query">Title:</label>
@@ -55,13 +55,12 @@
   </form>
 
 
-  <!-- Afișare doar dacă există căutare activă și cărți -->
+
   <div th:if="${searchActive}">
     <div th:if="${#lists.isEmpty(books)}" class="no-results">
       <p>No books found for your query.</p>
     </div>
 
-    <!-- Afișare lista de cărți doar dacă există rezultate -->
     <div th:unless="${#lists.isEmpty(books)}">
       <ul class="book-list">
         <li class="book-item" th:each="book : ${books}">
@@ -73,7 +72,6 @@
           <p><strong>Genre:</strong> <span th:text="${book.categories}">Categorie</span></p>
           <p><strong>Description:</strong> <span th:text="${book.description}">Descriere</span></p>
 
-          <!-- Rating mediu -->
           <div class="rating">
             <span th:each="i : ${#numbers.sequence(1, 5)}">
               <i th:class="${i <= book.averageRating} ? 'fas fa-star' : 'far fa-star'"></i>

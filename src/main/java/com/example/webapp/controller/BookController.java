@@ -1,7 +1,7 @@
 package com.example.webapp.controller;
 
 import com.example.webapp.model.Book;
-import com.example.webapp.model.Review;  // Import corect pentru Review
+import com.example.webapp.model.Review;
 import com.example.webapp.model.User;
 import com.example.webapp.repository.BookRepository;
 import com.example.webapp.repository.UserRepository;
@@ -52,14 +52,14 @@ public class BookController {
             model.addAttribute("currentUsername", "Guest");
         }
 
-        // Dacă există un query, autor sau gen pentru căutare
+        // Daca exista un query, autor sau gen pentru cautare
         if ((query != null && !query.trim().isEmpty()) ||
                 (author != null && !author.trim().isEmpty()) ||
                 (genre != null && !genre.trim().isEmpty())) {
 
             searchActive = true;
 
-            // Construim URL-ul API în funcție de parametri
+            // Construim URL-ul API in functie de parametri
             RestTemplate restTemplate = new RestTemplate();
             StringBuilder urlBuilder = new StringBuilder("https://www.googleapis.com/books/v1/volumes?q=");
 
@@ -80,7 +80,7 @@ public class BookController {
 
             urlBuilder.append("&maxResults=40&key=").append(apiKey);
 
-            // Apelăm API-ul Google Books
+            // Apelam API-ul Google Books
             String response = restTemplate.getForObject(urlBuilder.toString(), String.class);
             ObjectMapper mapper = new ObjectMapper();
 
@@ -112,7 +112,7 @@ public class BookController {
                 e.printStackTrace();
             }
 
-            // Sortăm în funcție de parametrii
+            // Sortam in functie de parametrii
             if (sort.equals("rating")) {
                 books.sort(Comparator.comparingDouble(Book::getAverageRating));
             } else if (sort.equals("author")) {
@@ -123,7 +123,7 @@ public class BookController {
                 books.sort(Comparator.comparing(Book::getCategories));
             }
 
-            // Inversăm ordinea dacă e nevoie
+            // Inversam ordinea daca e nevoie
             if (order.equals("desc")) {
                 Collections.reverse(books);
             }
@@ -133,9 +133,9 @@ public class BookController {
         model.addAttribute("query", query);
         model.addAttribute("author", author);
         model.addAttribute("sort", sort);
-        model.addAttribute("order", order);  // Trimitem și ordinea
-        model.addAttribute("genre", genre);  // Trimitem și genul
-        model.addAttribute("searchActive", searchActive);  // Indicator dacă căutarea este activă
+        model.addAttribute("order", order);
+        model.addAttribute("genre", genre);
+        model.addAttribute("searchActive", searchActive);
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
         model.addAttribute("username", getUsername(authentication));
@@ -147,10 +147,8 @@ public class BookController {
 
     @GetMapping("/topBooks")
     public String getTopBooks(Model model, Authentication authentication) {
-        // Preluăm toate cărțile din baza de date
         List<Book> books = bookRepository.findAll();
 
-        // Calculează ratingul mediu pentru fiecare carte
         for (Book book : books) {
             double averageRating = book.getReviews().stream()
                     .mapToInt(Review::getRating)
@@ -159,17 +157,17 @@ public class BookController {
             book.setAverageRating(averageRating);
         }
 
-        // Sortează cărțile în funcție de rating descrescător
+        // Sorteaza cartile in functie de rating descrescator
         books.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
 
-        // Adaugă lista de cărți sortată în model
+        // Adauga lista de carti sortata în model
         model.addAttribute("books", books);
 
-        // Obține lista de bookIds din favorite
+        // Obtine lista de bookIds din favorite
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
 
-        // Adaugă numele utilizatorului conectat în model
+        // Adauga numele utilizatorului conectat in model
         if (authentication != null && authentication.isAuthenticated()) {
             String currentUsername = authentication.getName();
             model.addAttribute("currentUsername", currentUsername);
@@ -182,10 +180,8 @@ public class BookController {
 
     @GetMapping("/hottestTopics")
     public String getHottestTopics(Model model, Authentication authentication) {
-        // Preluăm toate cărțile din baza de date
         List<Book> books = bookRepository.findAll();
 
-        // Sortează cărțile în funcție de numărul de recenzii (descrescător)
         books.sort(Comparator.comparingInt(book -> {
             Book realBook = (Book) book;
             if (realBook.getReviews() != null) {
@@ -195,14 +191,12 @@ public class BookController {
         }).reversed());
 
 
-        // Adaugă lista de cărți sortată în model
         model.addAttribute("books", books);
 
-        // Obține lista de bookIds din favorite pentru utilizatorul autentificat
         Set<String> favoriteBookIds = getFavoriteBookIds(authentication);
         model.addAttribute("favoriteBookIds", favoriteBookIds);
 
-        // Adaugă numele utilizatorului autentificat
+        // Adauga numele utilizatorului autentificat
         if (authentication != null && authentication.isAuthenticated()) {
             String currentUsername = authentication.getName();
             model.addAttribute("currentUsername", currentUsername);
@@ -217,9 +211,9 @@ public class BookController {
 
 
 
-    /**
-     * Metodă auxiliară pentru parsarea unui obiect Book din JsonNode.
-     */
+
+     // Metoda auxiliara pentru parsarea unui obiect Book din JsonNode.
+
     private Book parseBookFromJson(JsonNode item) {
         if (item == null || item.path("volumeInfo").isMissingNode()) {
             return null;
@@ -228,7 +222,7 @@ public class BookController {
         Book book = new Book();
         book.setId(item.path("id").asText());
 
-        // Setează titlul
+        // Seteaza titlul
         JsonNode titleNode = item.path("volumeInfo").path("title");
         if (!titleNode.isMissingNode()) {
             book.setTitle(titleNode.asText());
@@ -248,7 +242,7 @@ public class BookController {
             book.setAuthors("Unknown Author");
         }
 
-        // Extrage descrierea cărții
+        // Extrage descrierea cartii
         String description = item.path("volumeInfo").path("description").asText(null);
         if (description == null || description.isEmpty()) {
             description = "Description not available.";
@@ -271,9 +265,9 @@ public class BookController {
     }
 
 
-    /**
-     * Metodă auxiliară pentru obținerea setului de bookIds favorite ale utilizatorului.
-     */
+
+     // Metoda auxiliara pentru obtinerea setului de bookIds favorite ale utilizatorului.
+
     private Set<String> getFavoriteBookIds(Authentication authentication) {
         Set<String> favoriteBookIds = new HashSet<>();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -288,17 +282,18 @@ public class BookController {
         return favoriteBookIds;
     }
 
-    /**
-     * Metodă auxiliară pentru obținerea numelui utilizatorului autentificat.
-     */
+
+     //Metoda auxiliara pentru obtinerea numelui utilizatorului autentificat.
     private String getUsername(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated() &&
                 !authentication.getPrincipal().equals("anonymousUser")) {
             return authentication.getName();
         } else {
-            return null;  // Returnăm null în loc de "User"
+            return null;  // Returnam null în loc de "User"
         }
     }
 
 }
+
+
 

@@ -9,18 +9,15 @@
 </head>
 <body>
 
-<!-- Include navbar -->
 <div th:replace="navbar.html"></div>
 
 <div class="settings-container">
-    <!-- Profile Section with Profile Picture -->
     <div class="profile-header">
         <div class="profile-header-left">
             <h2 th:text="${user.name} + ' Profile'"></h2>
         </div>
 
         <div class="profile-picture-container">
-            <!-- Doar utilizatorul conectat poate schimba poza -->
             <form th:if="${isCurrentUser}" th:action="@{/profile/uploadProfilePicture}" method="post" enctype="multipart/form-data">
                 <label for="profilePictureInput">
                     <img id="profileImage" th:src="${user.profileImageUrl ?: '/img/default-profile.png'}" alt="Profile Image" class="profile-picture-circle">
@@ -28,19 +25,16 @@
                 </label>
             </form>
 
-            <!-- Dacă utilizatorul nu este conectat, doar afișează poza -->
             <div th:if="${!isCurrentUser}">
                 <img th:src="${user.profileImageUrl != null ? user.profileImageUrl : '/img/default-profile.png'}"
                      alt="Profile Image" class="profile-picture-circle">
             </div>
         </div>
     </div>
-    <!-- Member Info -->
     <p ><strong>Member since:</strong> <span th:text="${user.registrationDate.format(T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd'))}"></span></p>
-    <!-- Bio Section -->
+
     <div id="bioSection" th:if="${user.bio != null && !user.bio.isEmpty()}">
         <p th:text="${user.bio}"></p>
-        <!-- Only the logged-in user can edit their bio -->
         <button th:if="${isCurrentUser}" class="btn book-btn" onclick="editBio()">Edit Bio</button>
     </div>
     <div id="bioSection" th:if="${user.bio == null || user.bio.isEmpty()}">
@@ -48,7 +42,6 @@
         <button th:if="${isCurrentUser}" class="btn book-btn" onclick="editBio()">Add Bio</button>
     </div>
 
-    <!-- Bio Form -->
     <div id="bioForm" style="display: none;">
         <form th:action="@{/profile/updateBio}" method="post">
             <div class="form-group">
@@ -60,10 +53,9 @@
 
     <br>
     <h2>Activity</h2>
-    <!-- Activity sections like Reviews and Favorites -->
     <button id="toggleReviews" data-section="Reviews" class="btn book-btn" onclick="toggleSection('reviewsSection', 'toggleReviews')">Show Reviews</button>
     <div id="reviewsSection" class="settings-section-content" style="display: none;">
-        <h3>Your Reviews</h3>
+        <h3>Reviews</h3>
         <ul th:if="${!#lists.isEmpty(userReviews)}" th:each="review : ${userReviews}">
             <li>
                 <p><strong>Book:</strong> <span th:text="${review.book.title}"></span></p>
@@ -76,7 +68,6 @@
         <p th:if="${#lists.isEmpty(userReviews)}">This user has not written any reviews yet.</p>
     </div>
 
-    <!-- Favorite Books Section -->
     <button id="toggleFavorites" data-section="Favorite Books" class="btn book-btn" onclick="toggleSection('favoritesSection', 'toggleFavorites')">Show Favorite Books</button>
     <div id="favoritesSection" class="settings-section-content" style="display: none;">
         <h3>Favorite Books</h3>
@@ -89,7 +80,6 @@
         <p th:if="${#lists.isEmpty(favoriteBooks)}">This user has no favorite books.</p>
     </div>
 
-    <!-- Change Password and Delete Account, only for current user -->
     <div th:if="${isCurrentUser}">
 
         <h2>Change Password</h2>

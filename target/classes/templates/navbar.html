@@ -10,14 +10,14 @@
 
 <div class="navbar">
     <div id="menu-button">
-        <i class="fas fa-bars"></i> <!-- Iconiță pentru meniu -->
+        <i class="fas fa-bars"></i>
     </div>
     <h1><a href="/home" style="text-decoration: none; color: white;">e-Books</a></h1>
 
-    <div class="navbar-right"> <!-- Wrapper pentru partea dreaptă -->
+    <div class="navbar-right">
         <div class="user-menu">
             <button id="userButton">
-                <i class="fas fa-user"></i> <!-- Iconiță pentru utilizator -->
+                <i class="fas fa-user"></i>
                 <span th:text="${currentUsername != null ? currentUsername : 'Guest'}">Guest</span>
             </button>
             <div class="dropdown-menu" id="userDropdown" th:if="${currentUsername != null}">
@@ -32,8 +32,8 @@
         <div class="search-bar">
             <button id="searchIcon"><i class="fas fa-search"></i></button>
             <div class="search-dropdown">
-                <form th:action="@{/search}" method="get">
-                    <input type="text" name="query" placeholder="Căutare cărți..." />
+                <form th:action="@{/users/search}" method="get">
+                    <input type="text" name="username" placeholder="Search user..." />
                 </form>
             </div>
         </div>
@@ -41,19 +41,18 @@
 
 </div>
 
-<!-- Meniul lateral -->
+
 <div id="side-menu">
     <a href="/home">Home</a>
     <a th:href="@{/search?query=}">Search Book</a>
     <a th:href="@{/topBooks}">Top books</a>
     <a th:href="@{/hottestTopics}">Hottest Topics</a>
-    <a th:href="@{/search?genre=Fiction}">Fiction</a> <!-- Caută și sortează după Fiction -->
-    <a th:href="@{/search?genre=History}">History</a> <!-- Caută și sortează după History -->
-    <a th:href="@{/search?genre=Humor}">Humor</a> <!-- Caută și sortează după Humor -->
-    <a th:href="@{/search?genre=Art}">Arts</a> <!-- Caută și sortează după Arts -->
+    <a th:href="@{/search?genre=Fiction}">Fiction</a>
+    <a th:href="@{/search?genre=History}">History</a>
+    <a th:href="@{/search?genre=Humor}">Humor</a>
+    <a th:href="@{/search?genre=Art}">Arts</a>
 </div>
 
-<!-- Include scriptul extern pentru navigație -->
 <script src="/js/navbar.js"></script>
 
 </body>

@@ -102,12 +102,11 @@ class ReviewTest {
 
     @Test
     void testLikeAndDislikeCounts() {
-        // Test incrementarea și decrementarea like-urilor și dislike-urilor
         review.setLikes(5);
         review.setDislikes(2);
 
-        review.setLikes(review.getLikes() + 1); // Incrementare like
-        review.setDislikes(review.getDislikes() + 1); // Incrementare dislike
+        review.setLikes(review.getLikes() + 1);
+        review.setDislikes(review.getDislikes() + 1);
 
         assertEquals(6, review.getLikes());
         assertEquals(3, review.getDislikes());

@@ -9,34 +9,28 @@
 </head>
 <body>
 
-<!-- Include navbar -->
 <div th:replace="navbar.html"></div>
 
-<!-- Container principal pentru top books -->
 <div class="container">
   <p class="fav-books-message">Top Books</p>
 
-  <!-- Verifică dacă există cărți în lista books -->
   <div th:if="${#lists.isEmpty(books)}" class="no-results">
     <p>No books found.</p>
   </div>
 
-  <!-- Afișează lista de cărți -->
   <div th:unless="${#lists.isEmpty(books)}">
     <ul class="book-list">
       <li class="book-item" th:each="book : ${books}">
-        <!-- Butonul în formă de inimă -->
         <button class="favorite-button"
                 th:data-book-id="${book.id}"
                 th:classappend="${favoriteBookIds.contains(book.id)} ? ' favorited' : ''">
           <i class="fas fa-heart"></i>
         </button>
         <h3 th:text="${book.title}">Titlu carte</h3>
-        <p><strong>Autor:</strong> <span th:text="${book.authors}">Autor</span></p>
-        <p><strong>Gen:</strong> <span th:text="${book.categories}">Categorie</span></p>
-        <p><strong>Descriere:</strong> <span th:text="${book.description}">Descriere</span></p>
+        <p><strong>Author:</strong> <span th:text="${book.authors}">Author</span></p>
+        <p><strong>Genre:</strong> <span th:text="${book.categories}">Genre</span></p>
+        <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
 
-        <!-- Rating mediu -->
         <div class="rating">
             <span th:each="i : ${#numbers.sequence(1, 5)}">
                 <i th:class="${i <= book.averageRating} ? 'fas fa-star' : 'far fa-star'"></i>

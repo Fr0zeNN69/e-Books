@@ -24,15 +24,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     return response.text();
                 })
                 .then(data => {
-                    // Schimbă starea butonului
+                    // schimba starea butonului
                     this.classList.toggle('favorited');
 
-                    // Dacă suntem pe pagina /home și am eliminat cartea din favorite, o eliminăm din DOM
+                    // daca eliminam cartea din favorite o elimin si din dom
                     if (!this.classList.contains('favorited') && window.location.pathname === '/home') {
                         const bookItem = this.closest('.book-item');
                         bookItem.parentNode.removeChild(bookItem);
 
-                        // Dacă nu mai există cărți în listă, afișăm mesajul corespunzător
                         if (document.querySelectorAll('.book-item').length === 0) {
                             const messageDiv = document.createElement('div');
                             messageDiv.innerHTML = '<p>You have no favorite books.</p>';

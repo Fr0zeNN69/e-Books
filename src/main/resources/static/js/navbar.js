@@ -1,7 +1,7 @@
-// Toggle pentru meniul lateral
+// toggle pt meniul lateral
 const menuButton = document.getElementById('menu-button');
 const sideMenu = document.getElementById('side-menu');
-const container = document.querySelector('.container'); // Secțiunea cu cărțile
+const container = document.querySelector('.container');
 
 if (menuButton && sideMenu) {
     menuButton.addEventListener('click', function (e) {
@@ -15,7 +15,7 @@ if (menuButton && sideMenu) {
         }
     });
 
-    // Închidere meniul când faci clic în afara meniului
+    // inchidere meniul cand faci click in afara meniului
     document.addEventListener('click', function (event) {
         if (!sideMenu.contains(event.target) && !menuButton.contains(event.target)) {
             console.log("Clicked outside, closing menu");
@@ -29,7 +29,6 @@ if (menuButton && sideMenu) {
     console.error("Menu button or side menu not found");
 }
 
-// Pentru meniul de utilizator (username)
 const userButton = document.getElementById('userButton');
 const userDropdown = document.getElementById('userDropdown');
 
@@ -40,7 +39,7 @@ if (userButton && userDropdown) {
         userDropdown.classList.toggle('active');
     });
 
-    // Ascundere dropdown când clickezi în afara butonului username
+    // ascundere dropdown cand dai clik in afara butonului username
     document.addEventListener('click', function(event) {
         if (!userButton.contains(event.target) && !userDropdown.contains(event.target)) {
             userDropdown.classList.remove('active');
@@ -50,7 +49,7 @@ if (userButton && userDropdown) {
     console.error("User button or dropdown not found");
 }
 
-// Pentru lupa de căutare
+//pt lupa de search
 const searchIcon = document.getElementById('searchIcon');
 const searchDropdown = document.querySelector('.search-dropdown');
 
@@ -61,7 +60,7 @@ if (searchIcon && searchDropdown) {
         searchDropdown.classList.toggle('active');
     });
 
-    // Ascundere doar dacă se face click în afara căsuței de căutare și iconiței
+    // ascundere doar daca face click in afara casutei de search si iconitei
     document.addEventListener('click', function (event) {
         if (!searchDropdown.contains(event.target) && !searchIcon.contains(event.target)) {
             searchDropdown.classList.remove('active');

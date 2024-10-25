@@ -1,6 +1,4 @@
-/* styles.css */
 
-/* Resetări de bază */
 * {
     margin: 0;
     padding: 0;
@@ -14,7 +12,6 @@ body {
     line-height: 1.6;
 }
 
-/* Containerul de Setări */
 .settings-container {
     max-width: 800px;
     margin: 40px auto;
@@ -31,7 +28,6 @@ body {
     padding-bottom: 10px;
 }
 
-/* Stilizare secțiuni de tip cutie pentru Reviews și Favorites */
 .settings-section-content {
     margin-top: 20px;
     padding: 20px;
@@ -44,7 +40,6 @@ body {
     padding-left: 20px;
 }
 
-/* Stilizare Formulare */
 form {
     margin-bottom: 40px;
 }
@@ -74,7 +69,6 @@ form {
     outline: none;
 }
 
-/* Stilizare Butoane */
 .btn {
     display: inline-block;
     padding: 10px 20px;
@@ -127,7 +121,6 @@ form {
     background-color: #c0392b;
 }
 
-/* Poziționează imaginea de profil în dreapta sus */
 .profile-header {
     display: flex;
     justify-content: space-between;
@@ -137,7 +130,7 @@ form {
     border-bottom: 2px solid #ecf0f1;
 
 
-    padding-bottom: 30px; /* Adaugă spațiu între text și linie */
+    padding-bottom: 30px;
 }
 
 .profile-header-left {
@@ -164,7 +157,7 @@ form {
 .profile-picture-circle:hover {
     border-color: #2980b9;
 }
-/* Elimină linia de sub titlu */
+
 .profile-header h2 {
     border-bottom: none;
     margin-bottom: 0;

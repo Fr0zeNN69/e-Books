@@ -33,7 +33,7 @@ public class HomeController {
 
             Set<Book> favoriteBooks = user.getFavoriteBooks();
 
-            // Calculează ratingul mediu pentru fiecare carte favorită
+            // Calculeaza ratingul mediu pentru fiecare carte favorita
             for (Book book : favoriteBooks) {
                 double averageRating = book.getReviews().stream()
                         .mapToInt(Review::getRating)
@@ -56,13 +56,13 @@ public class HomeController {
     }
 
 
-    // Metodă auxiliară pentru obținerea numelui utilizatorului autentificat
+    // Metoda auxiliara pentru obtinerea numelui utilizatorului autentificat
     private String getUsername(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated() &&
                 !authentication.getPrincipal().equals("anonymousUser")) {
             return authentication.getName();
         } else {
-            return null;  // Returnăm null pentru utilizatori neautentificați
+            return null;  // Returnam null pentru utilizatori neautentificati
         }
     }
 

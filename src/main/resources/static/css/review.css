@@ -1,7 +1,7 @@
-/* Containerul pentru voturi */
+
 .review-votes {
     display: flex;
-    justify-content: flex-end; /* Mută butoanele de like/dislike la dreapta */
+    justify-content: flex-end;
     gap: 10px;
     margin-top: 10px;
 }
@@ -26,7 +26,7 @@
     background-color: #d0d0d0;
 }
 
-/* Alte stilizări existente */
+
 * {
     margin: 0;
     padding: 0;
@@ -256,18 +256,18 @@ form {
     border: 1px solid #ccc;
 }
 a {
-    color: #3498db; /* Culoare standard albastră deschisă */
-    text-decoration: none; /* Elimină sublinierea */
+    color: #3498db;
+    text-decoration: none;
 }
 
 a:hover {
-    color: #2980b9; /* O nuanță mai închisă la hover */
+    color: #2980b9;
 }
 
 a:visited {
-    color: #34495e; /* O nuanță mai neutră pentru linkurile vizitate */
+    color: #34495e;
 }
 
 a:active {
-    color: #2980b9; /* Culoarea când linkul este apăsat */
+    color: #2980b9;
 }

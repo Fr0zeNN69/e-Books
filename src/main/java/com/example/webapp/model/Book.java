@@ -22,10 +22,9 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    @Transient // Nu va fi salvat în baza de date
+    @Transient // Nu va fi salvat in baza de date
     private double averageRating;
 
-    // Getters și setters
 
     public String getId() {
         return id;

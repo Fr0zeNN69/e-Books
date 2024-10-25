@@ -18,8 +18,8 @@ class UserTest {
     void setUp() {
         user = new User();
         user.setId(1L);
-        user.setName("John Doe");
-        user.setUsername("johndoe");
+        user.setName("test user");
+        user.setUsername("testuser");
         user.setPassword("securepassword");
         user.setBio("This is a test bio");
         user.setProfileImageUrl("http://example.com/profile.jpg");
@@ -34,14 +34,14 @@ class UserTest {
 
     @Test
     void testGetAndSetName() {
-        user.setName("Jane Doe");
-        assertEquals("Jane Doe", user.getName());
+        user.setName("test");
+        assertEquals("test", user.getName());
     }
 
     @Test
     void testGetAndSetUsername() {
-        user.setUsername("janedoe");
-        assertEquals("janedoe", user.getUsername());
+        user.setUsername("teest");
+        assertEquals("teest", user.getUsername());
     }
 
     @Test

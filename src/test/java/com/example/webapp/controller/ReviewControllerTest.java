@@ -59,7 +59,7 @@ class ReviewControllerTest {
         review.setReviewDate(LocalDate.now());
     }
 
-    // Test pentru adăugarea unei recenzii
+    // testing for add reviews
     @Test
     void testAddReview_Success() {
         when(authentication.getName()).thenReturn(username);
@@ -97,7 +97,7 @@ class ReviewControllerTest {
         verify(reviewRepository, never()).save(any(Review.class));
     }
 
-    // Test pentru like
+    // Tests for like
     @Test
     void testLikeReview_Success() {
         review.setLikes(0);
@@ -130,7 +130,7 @@ class ReviewControllerTest {
         assertEquals("Ai dat deja like.", response.get("error"));
     }
 
-    // Test pentru dislike
+    // Tests for dislike
     @Test
     void testDislikeReview_Success() {
         review.setLikes(1);

@@ -25,20 +25,20 @@ public class BookSearchService {
     private String apiKey;
 
     public List<Book> searchBooks(String query) {
-        // Creează o instanță de RestTemplate pentru a face cereri HTTP
+        // creez o instan de RestTemplate pentru a face cereri HTTP
         RestTemplate restTemplate = new RestTemplate();
 
-        // Construiește URL-ul cererii API
+        // construiesc URL-ul cererii API
         URI uri = UriComponentsBuilder.fromHttpUrl(API_URL)
                 .queryParam("q", query)
                 .queryParam("key", apiKey)
                 .build()
                 .toUri();
 
-        // Trimite cererea GET și primește răspunsul ca un Map
+        // trimite cererea GET si primeste raspunsul ca un Map
         Map<String, Object> response = restTemplate.getForObject(uri, Map.class);
 
-        // Extrage rezultatele din răspuns și convertește-le într-o listă de obiecte Book
+        // Extrage rezultatele din raspuns si converteste le intr o lista de obiecte Book
         List<Book> books = new ArrayList<>();
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("items");
 
@@ -48,10 +48,10 @@ public class BookSearchService {
 
                 Book book = new Book();
 
-                // Setează ID-ul cărții folosind id-ul de la Google Books
+                // Seteaza ID-ul cartii folosind id-ul de la Google Books
                 book.setId((String) item.get("id"));
 
-                // Setează titlul cărții
+                // Seteaza titlul cartii
                 book.setTitle((String) volumeInfo.get("title"));
 
 
@@ -65,7 +65,7 @@ public class BookSearchService {
                     book.setAuthors("Unknown");
                 }
 
-                // Verifică și salvează cartea în baza de date dacă nu există deja
+                // Verifica si salveaza cartea in baza de date dacă nu exista deja
                 if (!bookRepository.existsById(book.getId())) {
                     bookRepository.save(book);
                 }
