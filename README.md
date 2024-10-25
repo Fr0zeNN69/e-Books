@@ -26,8 +26,8 @@ To set up this project, you’ll need to configure the following:
 
 1. **Clone this Repository**:
    ```properties
-    git clone https://github.com/yourusername/e-books-webapp.git
-    cd e-books-webapp
+    git clone https://github.com/Fr0zeNN69/e-books.git
+    cd e-books
 
 2. **Install dependencies**:
    ```properties
